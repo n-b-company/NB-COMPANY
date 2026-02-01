@@ -1,21 +1,53 @@
 'use client';
 
 import React, { useState } from 'react';
-import { User, Lock, ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import Image from 'next/image';
-import { ASSETS } from '@/lib/constants';
+import { ASSETS } from '@/constants/constants';
+
+import { Input } from '@/components/ui/FormElements';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { loginSchema, type LoginFormValues } from '@/lib/validations';
+import { loginAction } from './actions';
+import { toast } from 'sonner';
 
 export default function LoginPage() {
-  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      username: '',
+      password: '',
+    },
+  });
+
+  const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
-    // Simulate login delay
-    setTimeout(() => {
-      window.location.href = '/dashboard';
-    }, 1500);
+    setServerError(null);
+
+    const formData = new FormData();
+    formData.append('username', data.username);
+    formData.append('password', data.password);
+
+    try {
+      const result = await loginAction(null, formData);
+      if (result?.error) {
+        setServerError(result.error);
+        toast.error(result.error);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Ocurrió un error inesperado');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -41,42 +73,38 @@ export default function LoginPage() {
         </div>
 
         {/* Login Form */}
-        <form onSubmit={handleLogin} className="w-full space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-6">
           <div className="space-y-4">
-            <div className="group relative">
-              <User
-                size={20}
-                className="group-focus-within:text-primary absolute top-1/2 left-4 -translate-y-1/2 text-zinc-500 transition-colors"
-              />
-              <input
-                type="text"
+            <div className="space-y-4">
+              <Input
+                id="user"
+                label="Usuario"
                 placeholder="Usuario"
-                className="ring-primary/20 focus:border-primary w-full rounded-xl border border-zinc-800 bg-zinc-900/50 py-4 pr-4 pl-12 text-zinc-500 transition-all outline-none placeholder:text-zinc-600 focus:ring-4"
-                defaultValue="Administrador"
-                readOnly
+                {...register('username')}
+                error={errors.username?.message}
               />
-            </div>
 
-            <div className="group relative">
-              <Lock
-                size={20}
-                className="group-focus-within:text-primary absolute top-1/2 left-4 -translate-y-1/2 text-zinc-500 transition-colors"
-              />
-              <input
+              <Input
+                id="password"
+                label="Contraseña"
                 type="password"
                 placeholder="Contraseña"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="ring-primary/20 focus:border-primary w-full rounded-xl border border-zinc-800 bg-zinc-900/50 py-4 pr-4 pl-12 text-white transition-all outline-none placeholder:text-zinc-600 focus:ring-4"
-                required
+                {...register('password')}
+                error={errors.password?.message}
               />
             </div>
           </div>
 
+          {serverError && (
+            <div className="rounded-lg bg-red-500/10 p-3 text-center text-sm text-red-500">
+              {serverError}
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={isLoading}
-            className="bg-primary relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl py-4 text-base font-bold text-white transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-70 my-4"
+            className="bg-primary relative my-4 flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl py-4 text-base font-bold text-white transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-70"
           >
             {isLoading ? (
               <Loader2 className="h-5 w-5 animate-spin" />

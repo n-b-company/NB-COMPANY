@@ -5,7 +5,7 @@ import { Plus, Package, AlertTriangle, Stethoscope, Store, Utensils, Fuel } from
 
 export default function DashboardPage() {
   return (
-    <div className="px-6 py-8 my-4">
+    <div className="my-4 px-6 py-8">
       {/* KPI Cards */}
       <div className="mb-8 grid grid-cols-2 gap-4">
         <div className="group hover:border-primary/50 rounded-2xl border border-zinc-800 bg-zinc-900 p-5 transition-all">
