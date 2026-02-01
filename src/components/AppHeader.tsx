@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { ASSETS } from '@/lib/constants';
+import { ASSETS } from '@/constants/constants';
 
 export default function AppHeader() {
   return (
@@ -25,11 +25,12 @@ export default function AppHeader() {
         </div>
       </div>
       <div className="flex items-center gap-3">
-        <div className="border-primary/30 h-10 w-10 overflow-hidden rounded-full border-2 p-0.5">
-          <img
+        <div className="border-primary/30 relative h-10 w-10 overflow-hidden rounded-full border-2 p-0.5">
+          <Image
             src={ASSETS.AVATAR_PLACEHOLDER}
             alt="Avatar"
-            className="h-full w-full rounded-full object-cover"
+            fill
+            className="rounded-full object-cover"
           />
         </div>
       </div>
