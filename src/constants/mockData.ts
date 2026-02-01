@@ -1,13 +1,4 @@
-import {
-  Store,
-  Stethoscope,
-  Utensils,
-  Fuel,
-  MapPin,
-  CreditCard,
-  Phone,
-  Router,
-} from 'lucide-react';
+import { Store, Stethoscope, Utensils, Fuel, CreditCard, Phone, Router } from 'lucide-react';
 
 export const CLIENTES_MOCK = [
   {
@@ -174,12 +165,6 @@ export const CLIENTES_MOCK = [
 
 export const DEFAULT_INFO_ITEMS = [
   {
-    label: 'Dirección',
-    value: 'Av. Corrientes 1234',
-    subValue: 'CABA, Argentina',
-    icon: MapPin,
-  },
-  {
     label: 'Plan Mensual',
     subValue: '$12.500 / mes',
     icon: CreditCard,
@@ -197,4 +182,19 @@ export const DEFAULT_INFO_ITEMS = [
     subValue: '3 Terminales instaladas',
     icon: Router,
   },
+];
+
+export const CLIENT_FILTER_OPTIONS = [
+  { id: 'all', label: 'Todos' },
+  { id: 'success', label: 'Al día' },
+  { id: 'warning', label: 'Prox. Vencimiento' },
+  { id: 'danger', label: 'Vencido' },
+  { id: 'inactive', label: 'Desactivados' },
+];
+
+export const COBROS_FILTER_OPTIONS = [
+  { id: 'all', label: 'Todos' },
+  { id: 'success', label: 'Pagados' },
+  { id: 'warning', label: 'Pendientes' },
+  { id: 'danger', label: 'Rechazados' },
 ];

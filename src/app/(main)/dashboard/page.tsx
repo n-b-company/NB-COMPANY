@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { Plus, Package, AlertTriangle } from 'lucide-react';
 import { CLIENTES_MOCK } from '@/constants/mockData';
+import EntityCard, { StatusVariant } from '@/components/ui/EntityCard'; // Added import for EntityCard
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -68,37 +69,16 @@ export default function DashboardPage() {
 
       {/* List Items */}
       <div className="space-y-3">
-        {top10Clientes.map((item, i) => (
-          <div
-            key={i}
-            onClick={() => router.push(`/cliente/${item.id}`)}
-            className="group flex cursor-pointer items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-900 p-4 transition-all hover:bg-zinc-800/50 active:scale-[0.98]"
-          >
-            <div className="flex items-center gap-4">
-              <div className="group-hover:text-primary group-hover:border-primary flex h-12 w-12 items-center justify-center rounded-xl border border-zinc-700 bg-zinc-800 text-zinc-400 transition-colors">
-                <item.Icon size={24} />
-              </div>
-              <div>
-                <h4 className="group-hover:text-primary font-bold text-white transition-colors">
-                  {item.name}
-                </h4>
-                <p className="text-[10px] font-medium text-zinc-500 uppercase">{item.address}</p>
-              </div>
-            </div>
-            <div className="shrink-0 text-right">
-              <span
-                className={`inline-block rounded-full border px-3 py-1 text-[9px] font-black tracking-tighter uppercase ${
-                  item.status === 'warning'
-                    ? 'border-amber-500/20 bg-amber-500/10 text-amber-500'
-                    : item.status === 'danger'
-                      ? 'border-red-500/20 bg-red-500/10 text-red-500'
-                      : 'border-emerald-500/20 bg-emerald-500/10 text-emerald-500'
-                }`}
-              >
-                {item.statusText}
-              </span>
-            </div>
-          </div>
+        {top10Clientes.map((item) => (
+          <EntityCard
+            key={item.id}
+            title={item.name}
+            subtitle={item.address}
+            icon={item.Icon}
+            statusText={item.statusText}
+            statusVariant={item.status as StatusVariant}
+            actionHref={`/cliente/${item.id}`}
+          />
         ))}
       </div>
     </div>

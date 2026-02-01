@@ -34,7 +34,7 @@ export default function NuevaInstalacionPage() {
     // Aquí iría la lógica para guardar en la DB
     console.log(data);
     toast.success('Instalación registrada con éxito');
-    router.push('/dashboard');
+    router.push('/comprobante');
   };
 
   return (
