@@ -5,12 +5,12 @@ import { FormSectionProps, InputProps, SelectProps, TextareaProps } from '@/type
 
 export const FormSection = ({ title, icon: Icon, children }: FormSectionProps) => {
   return (
-    <section className="space-y-6 rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
-      <div className="mb-2 flex items-center gap-2 border-b border-zinc-800 pb-4">
+    <section className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-900/50 p-4">
+      <div className="mb-2 flex items-center gap-2 border-b border-zinc-800 pb-2">
         <Icon size={18} className="text-primary" />
         <h3 className="text-xs font-bold tracking-wider text-white uppercase">{title}</h3>
       </div>
-      <div className="grid grid-cols-1 gap-6">{children}</div>
+      <div className="grid grid-cols-1 gap-4">{children}</div>
     </section>
   );
 };

@@ -36,6 +36,7 @@ export default function NuevaInstalacionPage() {
       latitude: null,
       longitude: null,
       image_url: '',
+      costo_servicio: 0,
       fecha_instalacion: new Date().toISOString().split('T')[0],
     },
   });
@@ -159,6 +160,15 @@ export default function NuevaInstalacionPage() {
               placeholder="Ej: 1122334455"
               {...register('telefono')}
               error={errors.telefono?.message}
+            />
+            <Input
+              id="costo_servicio"
+              label="Costo del Servicio ($)"
+              type="number"
+              step="0.01"
+              placeholder="Ej: 5000"
+              {...register('costo_servicio', { valueAsNumber: true })}
+              error={errors.costo_servicio?.message}
             />
           </div>
 

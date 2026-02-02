@@ -1,4 +1,4 @@
-import { Home, Users, Plus, ReceiptText, Map } from 'lucide-react';
+import { Home, Users, Plus, ReceiptText, User } from 'lucide-react';
 import { StatusVariant } from '@/types';
 
 export const ASSETS = {
@@ -51,5 +51,5 @@ export const NAV_ITEMS = [
   { label: 'Clientes', href: '/clientes', icon: Users },
   { label: 'Alta', href: '/nueva-instalacion', icon: Plus, isAction: true },
   { label: 'Cobro', href: '/cobros', icon: ReceiptText },
-  { label: 'Mapa', href: '/mapa', icon: Map },
+  { label: 'Perfil', href: '/perfil', icon: User },
 ];

@@ -39,6 +39,7 @@ export default function ClientConfig({ client, onSuccess }: ClientConfigProps) {
       ip_puerto: installation?.ipPort || '',
       notas: client.notes || '',
       image_url: client.imageUrl || '',
+      costo_servicio: client.serviceCost || 0,
       fecha_instalacion: installation?.installedAt
         ? new Date(installation.installedAt).toISOString().split('T')[0]
         : new Date().toISOString().split('T')[0],
@@ -72,7 +73,7 @@ export default function ClientConfig({ client, onSuccess }: ClientConfigProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 pb-20">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pb-10">
       <FormSection title="Foto del Local" icon={Store}>
         <ImageCapture
           label="Foto de Fachada"
@@ -97,6 +98,14 @@ export default function ClientConfig({ client, onSuccess }: ClientConfigProps) {
             icon={Phone}
             {...register('telefono')}
             error={errors.telefono?.message}
+          />
+          <Input
+            label="Costo del Servicio ($)"
+            type="number"
+            step="0.01"
+            icon={FileText}
+            {...register('costo_servicio', { valueAsNumber: true })}
+            error={errors.costo_servicio?.message}
           />
         </div>
       </FormSection>
@@ -148,7 +157,7 @@ export default function ClientConfig({ client, onSuccess }: ClientConfigProps) {
         />
       </FormSection>
 
-      <div className="px-6 pt-4">
+      <div className="px-6 pt-1">
         <button
           type="submit"
           disabled={isSubmitting}

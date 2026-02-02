@@ -1,4 +1,4 @@
-import { MessageCircle, RefreshCw, Trash2 } from 'lucide-react';
+import { MessageCircle, RefreshCw, Trash2, Power } from 'lucide-react';
 import { ClientActionsProps } from '@/types';
 
 export default function ClientActions({
@@ -8,37 +8,42 @@ export default function ClientActions({
   isInactive,
 }: ClientActionsProps) {
   return (
-    <div className="flex flex-col gap-4 pt-4">
+    <div className="grid grid-cols-3 gap-3 pt-1">
       {!isInactive && (
         <button
           onClick={onWhatsApp}
-          className="flex w-full items-center justify-center gap-3 rounded-xl border border-zinc-700 bg-zinc-800 py-4 text-[#25D366] transition-all hover:bg-zinc-700 active:scale-[0.98]"
+          title="Contactar WhatsApp"
+          className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-zinc-700 bg-zinc-900 py-3 text-[#25D366] transition-all hover:bg-zinc-800 active:scale-[0.95]"
         >
-          <MessageCircle size={24} fill="currentColor" />
-          <span className="font-bold">Contactar por WhatsApp</span>
+          <MessageCircle size={22} fill="currentColor" />
+          <span className="text-[10px] font-black tracking-tighter uppercase">Chat</span>
         </button>
       )}
 
       {!isInactive && (
         <button
           onClick={onRenew}
-          className="bg-primary hover:bg-primary/90 shadow-primary/20 flex w-full items-center justify-center gap-3 rounded-xl py-4 text-white shadow-lg transition-all active:scale-[0.98]"
+          title="Renovar Suscripción"
+          className="bg-primary/10 border-primary/30 text-primary hover:bg-primary/20 flex flex-col items-center justify-center gap-2 rounded-2xl border py-3 transition-all active:scale-[0.95]"
         >
-          <RefreshCw size={20} className="font-bold" />
-          <span className="font-bold">Renovar Suscripción</span>
+          <RefreshCw size={20} strokeWidth={2.5} />
+          <span className="text-[10px] font-black tracking-tighter uppercase">Renovar</span>
         </button>
       )}
 
       <button
         onClick={onDeactivate}
-        className={`flex w-full items-center justify-center gap-3 rounded-xl border py-4 transition-all active:scale-[0.98] ${
+        title={isInactive ? 'Activar Cliente' : 'Desactivar Cliente'}
+        className={`flex flex-col items-center justify-center gap-2 rounded-2xl border py-3 transition-all active:scale-[0.95] ${
           isInactive
             ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20'
             : 'border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500/20'
-        }`}
+        } ${isInactive ? 'col-span-3' : ''}`}
       >
-        <Trash2 size={20} />
-        <span className="font-bold">{isInactive ? 'Activar Cliente' : 'Desactivar Cliente'}</span>
+        {isInactive ? <Power size={20} /> : <Trash2 size={20} />}
+        <span className="text-[10px] font-black tracking-tighter uppercase">
+          {isInactive ? 'Activar' : 'Baja'}
+        </span>
       </button>
     </div>
   );

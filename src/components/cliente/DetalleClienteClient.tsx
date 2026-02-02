@@ -17,7 +17,7 @@ import ClientHistory from '@/components/cliente/ClientHistory';
 import ClientLocation from '@/components/cliente/ClientLocation';
 import ClientActions from '@/components/cliente/ClientActions';
 import ClientConfig from '@/components/cliente/ClientConfig';
-import { toggleClientStatus } from '@/lib/actions';
+import { toggleClientStatus, renewSubscription } from '@/lib/actions';
 
 import { Client, InfoItem, Installation, Payment } from '@/types';
 import { STATUS_TEXT_MAP } from '@/constants/constants';
@@ -58,9 +58,32 @@ export default function DetalleClienteClient({ client }: DetalleClienteClientPro
   }
 
   // Handlers para acciones
-  const handleRenew = () => {
-    toast.success('Iniciando proceso de renovación...');
-    router.push('/comprobante');
+  const handleRenew = async () => {
+    toast.loading('Procesando renovación...');
+
+    // 1. Calcular el monto total (Costo Unitario x Cantidad de Equipos)
+    const equipmentCount = client.installations[0]?.equipmentCount || 1;
+    const totalAmount = (client.serviceCost || 0) * equipmentCount;
+
+    // 2. Llamar a la acción del servidor para registrar el pago
+    const result = await renewSubscription(client.id, totalAmount);
+
+    if (result.success) {
+      toast.dismiss();
+      toast.success('Suscripción renovada con éxito');
+
+      const params = new URLSearchParams({
+        id: `#${client.id.substring(client.id.length - 8).toUpperCase()}`,
+        empresa: client.name,
+        monto: `ARS $ ${totalAmount.toLocaleString() || '0'}`,
+        vencimiento: proximoVencimientoText,
+        telefono: client.phone || '',
+      });
+      router.push(`/comprobante?${params.toString()}`);
+    } else {
+      toast.dismiss();
+      toast.error(result.error || 'Error al renovar');
+    }
   };
 
   const handleDeactivate = async () => {
@@ -106,8 +129,6 @@ export default function DetalleClienteClient({ client }: DetalleClienteClientPro
     },
   ];
 
-  // --- Lógica de Estado de Cuenta Corregida ---
-
   // 1. Encontrar el último pago cobrado
   const lastPayment = [...client.payments]
     .filter((p) => p.status === 'PAID')
@@ -124,13 +145,11 @@ export default function DetalleClienteClient({ client }: DetalleClienteClientPro
     if (!date) return 'Sin fecha';
     return new Intl.DateTimeFormat('es-AR', {
       day: '2-digit',
-      month: 'short',
+      month: 'long',
       year: 'numeric',
     }).format(new Date(date));
   };
 
-  // 3. Lógica Pro: Si status es OVERDUE, el "Vencimiento" es la fecha base que ya pasó.
-  // Si está al día, el "Vencimiento" es "Al día".
   let vencimientoLabel = 'Al día';
   if (status === 'OVERDUE') {
     // Buscar la fecha que causó el vencimiento (1 mes después del último periodo o instalación)
@@ -143,13 +162,13 @@ export default function DetalleClienteClient({ client }: DetalleClienteClientPro
     vencimientoLabel = formatDate(pendingPayments[0].period || pendingPayments[0].createdAt);
   }
 
-  const ultimoPagoText = lastPayment
-    ? `${formatDate(lastPayment.paidAt || lastPayment.createdAt)} ($${lastPayment.amount.toLocaleString()})`
-    : 'Sin pagos registrados';
+  // 4. Próximo Vencimiento
+  // Si el cliente está vencido, calculamos la próxima fecha desde hoy.
+  // Si está al día, sumamos un mes al último periodo pagado.
+  const today = new Date();
+  const lastPeriod = lastPayment?.period ? new Date(lastPayment.period) : null;
+  const baseDateForNext = status === 'OVERDUE' || !lastPeriod ? today : lastPeriod;
 
-  // 4. Próximo Vencimiento (Siempre es la fecha de la siguiente renovación estimada)
-  const baseDateForNext =
-    lastPayment?.period || client.installations[0]?.installedAt || client.createdAt;
   const nextRenovDate = new Date(baseDateForNext);
   nextRenovDate.setMonth(nextRenovDate.getMonth() + 1);
   const proximoVencimientoText = formatDate(nextRenovDate);
@@ -162,8 +181,14 @@ export default function DetalleClienteClient({ client }: DetalleClienteClientPro
     if (daysUntilExpiration === 1) dynamicStatusText = 'VENCE MAÑANA';
   }
 
+  const getBottomPadding = () => {
+    if (activeTab === 'Configuración') return 'pb-10';
+    if (activeTab === 'Historial') return 'pb-32';
+    return 'pb-48';
+  };
+
   return (
-    <div className="flex flex-col pb-40">
+    <div className={`flex flex-col ${getBottomPadding()}`}>
       <ClientHeader
         name={client.name}
         id={`#${client.id.substring(client.id.length - 8).toUpperCase()}`}
@@ -173,13 +198,11 @@ export default function DetalleClienteClient({ client }: DetalleClienteClientPro
 
       <ClientTabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
 
-      <div className="flex flex-col gap-8 px-6 pt-8">
+      <div className="flex flex-col gap-3 px-6 pt-2">
         {activeTab === 'Información' && (
           <>
-            <div className="flex flex-col gap-8">
-              {client.imageUrl && (
-                <ClientImage src={client.imageUrl} alt={`Fachada ${client.name}`} />
-              )}
+            <div className="flex flex-col gap-3">
+              <ClientImage src={client.imageUrl || ''} alt={`Fachada ${client.name}`} />
               <InfoGrid items={infoItems} />
             </div>
 
@@ -187,7 +210,6 @@ export default function DetalleClienteClient({ client }: DetalleClienteClientPro
               vencimiento={vencimientoLabel}
               proximoVencimiento={proximoVencimientoText}
               saldoPendiente={`$${saldoTotal.toLocaleString()}`}
-              ultimoPago={ultimoPagoText}
               notas={client.notes || 'Sin notas u observaciones adicionales.'}
             />
           </>
@@ -206,7 +228,13 @@ export default function DetalleClienteClient({ client }: DetalleClienteClientPro
           />
         )}
 
-        {activeTab === 'Historial' && <ClientHistory payments={client.payments} />}
+        {activeTab === 'Historial' && (
+          <ClientHistory
+            payments={client.payments}
+            clientName={client.name}
+            clientPhone={client.phone || ''}
+          />
+        )}
 
         {activeTab !== 'Configuración' && (
           <ClientActions

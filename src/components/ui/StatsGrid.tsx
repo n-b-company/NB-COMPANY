@@ -1,19 +1,35 @@
+'use client';
+
 import { Package, AlertTriangle, FileX } from 'lucide-react';
 import { StatItemProps, StatsGridProps } from '@/types';
 import { STAT_VARIANTS } from '@/constants/constants';
+import { motion } from 'framer-motion';
 
 interface StatItemPropsExtended extends StatItemProps {
   isActive?: boolean;
   onClick?: () => void;
+  index: number;
 }
 
-function StatItem({ label, value, icon: Icon, variant, isActive, onClick }: StatItemPropsExtended) {
+function StatItem({
+  label,
+  value,
+  icon: Icon,
+  variant,
+  isActive,
+  onClick,
+  index,
+}: StatItemPropsExtended) {
   const style = STAT_VARIANTS[variant];
 
   return (
-    <button
+    <motion.button
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1 }}
+      whileTap={{ scale: 0.95 }}
       onClick={onClick}
-      className={`group flex w-full flex-col rounded-2xl border p-4 text-left transition-all duration-300 active:scale-95 ${
+      className={`group flex w-full flex-col rounded-2xl border p-4 text-left transition-all duration-300 ${
         isActive
           ? `border-primary bg-primary/10 shadow-primary/5 shadow-lg`
           : `border-zinc-800 bg-zinc-900 ${style.border}`
@@ -42,7 +58,7 @@ function StatItem({ label, value, icon: Icon, variant, isActive, onClick }: Stat
       >
         {value}
       </p>
-    </button>
+    </motion.button>
   );
 }
 
@@ -62,6 +78,7 @@ export default function StatsGrid({
   return (
     <div className="mb-8 grid grid-cols-3 gap-3">
       <StatItem
+        index={0}
         label="Activos"
         value={active}
         icon={Package}
@@ -70,6 +87,7 @@ export default function StatsGrid({
         onClick={() => handleToggle('ACTIVE')}
       />
       <StatItem
+        index={1}
         label="Vencer"
         value={warning}
         icon={AlertTriangle}
@@ -78,6 +96,7 @@ export default function StatsGrid({
         onClick={() => handleToggle('WARNING')}
       />
       <StatItem
+        index={2}
         label="Vencidos"
         value={overdue}
         icon={FileX}

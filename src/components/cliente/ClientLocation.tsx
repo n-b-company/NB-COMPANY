@@ -32,7 +32,7 @@ export default function ClientLocation({
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       {/* Mini Map View */}
       <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 shadow-xl">
         <Image
@@ -54,7 +54,7 @@ export default function ClientLocation({
         </div>
 
         {/* Floating Info */}
-        <div className="absolute right-4 bottom-4 left-4 flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-950/80 p-4 backdrop-blur-md">
+        <div className="absolute right-4 bottom-4 left-4 flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-950/80 p-3 backdrop-blur-md">
           <div className="flex items-center gap-3">
             <div className="text-primary rounded-xl border border-zinc-800 bg-zinc-900 p-2">
               <MapIcon size={20} />
@@ -70,33 +70,33 @@ export default function ClientLocation({
           </div>
           <button
             onClick={handleNavigate}
-            className="bg-primary flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black text-zinc-950 uppercase transition-all hover:brightness-110 active:scale-95"
+            className="bg-primary flex items-center gap-2 rounded-xl px-3 py-1.5 text-[10px] font-black text-zinc-950 uppercase transition-all hover:brightness-110 active:scale-95"
           >
-            <Navigation size={14} fill="currentColor" />
+            <Navigation size={12} fill="currentColor" />
             Navegar
           </button>
         </div>
       </div>
 
       {/* Address Details */}
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
-        <h4 className="mb-4 flex items-center gap-2 font-bold text-white">
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
+        <h4 className="mb-3 flex items-center gap-2 font-bold text-white">
           <MapPin size={18} className="text-primary" />
           Detalles de Ubicación
         </h4>
         <div className="space-y-4">
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-0.5">
             <span className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
               Dirección Principal
             </span>
-            <p className="font-medium text-white">{address || 'No registrada'}</p>
+            <p className="text-sm font-medium text-white">{address || 'No registrada'}</p>
           </div>
           {between && (
-            <div className="flex flex-col gap-1 pt-2">
+            <div className="flex flex-col gap-0.5 pt-1">
               <span className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
                 Entre Calles / Referencias
               </span>
-              <p className="text-sm text-zinc-400">{between}</p>
+              <p className="text-xs text-zinc-400">{between}</p>
             </div>
           )}
         </div>

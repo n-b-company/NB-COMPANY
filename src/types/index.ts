@@ -13,6 +13,7 @@ export interface Client {
   status: string;
   notes?: string | null;
   imageUrl?: string | null;
+  serviceCost?: number | null;
   latitude?: number | null;
   longitude?: number | null;
   createdAt: Date;

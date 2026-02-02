@@ -39,6 +39,7 @@ export async function createClientWithInstallation(data: InstalacionFormValues) 
         latitude: validatedData.latitude,
         longitude: validatedData.longitude,
         imageUrl: finalImageUrl,
+        serviceCost: validatedData.costo_servicio,
         notes: validatedData.notas,
       },
     });
@@ -66,6 +67,7 @@ export async function createClientWithInstallation(data: InstalacionFormValues) 
     return { success: false, error: 'Ocurrió un error inesperado al guardar los datos.' };
   }
 }
+
 export async function updateClient(clientId: string, data: InstalacionFormValues) {
   try {
     const validatedData = instalacionSchema.parse(data);
@@ -92,6 +94,7 @@ export async function updateClient(clientId: string, data: InstalacionFormValues
         latitude: validatedData.latitude,
         longitude: validatedData.longitude,
         imageUrl: finalImageUrl,
+        serviceCost: validatedData.costo_servicio,
         notes: validatedData.notas,
       },
     });
@@ -142,5 +145,41 @@ export async function toggleClientStatus(clientId: string, currentStatus: string
     return { success: true, newStatus };
   } catch {
     return { success: false, error: 'No se pudo cambiar el estado del cliente' };
+  }
+}
+export async function renewSubscription(clientId: string, amount: number) {
+  try {
+    // 1. Obtener la fecha para el periodo del pago (el mes actual)
+    const now = new Date();
+    const period = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    // 2. Crear el registro de pago cobrado
+    await prisma.payment.create({
+      data: {
+        clientId,
+        amount,
+        status: 'PAID',
+        method: 'CASH',
+        paidAt: now,
+        period: period,
+        description: `Renovación de suscripción - ${now.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}`,
+      },
+    });
+
+    // 3. Actualizar el estado del cliente a ACTIVE
+    await prisma.client.update({
+      where: { id: clientId },
+      data: { status: 'ACTIVE' },
+    });
+
+    revalidatePath(`/cliente/${clientId}`);
+    revalidatePath('/clientes');
+    revalidatePath('/dashboard');
+    revalidatePath('/cobros');
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error in renewSubscription:', error);
+    return { success: false, error: 'No se pudo procesar la renovación' };
   }
 }

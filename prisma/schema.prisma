@@ -25,18 +25,18 @@ enum Role {
 
 // 2. Clientes (Comercios/Empresas)
 model Client {
-  id        String       @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  ownerName String?
-  email     String?
-  phone     String?
-  address   String
-  between   String? // Entre calles
-  status    ClientStatus @default(ACTIVE)
-  notes     String?
-  latitude  Float?
-  longitude Float?
-  imageUrl  String?
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  ownerName   String?
+  phone       String?
+  address     String
+  between     String? // Entre calles
+  status      ClientStatus @default(ACTIVE)
+  notes       String?
+  latitude    Float?
+  longitude   Float?
+  imageUrl    String?
+  serviceCost Float?       @default(0)
 
   // Relaciones
   installations Installation[]
@@ -79,7 +79,7 @@ model Payment {
   method   PaymentMethod @default(TRANSFER)
 
   // Referencia o comprobante interno
-  referenceId String? @unique
+  referenceId String?
   description String? // Ej: Renovación Mayo 2024
 
   paidAt    DateTime?
