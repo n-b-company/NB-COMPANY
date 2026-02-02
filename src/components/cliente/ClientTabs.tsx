@@ -1,27 +1,35 @@
-import React from 'react';
+'use client';
 
-interface ClientTabsProps {
-  tabs: string[];
-  activeTab: string;
-  onTabChange: (tab: string) => void;
-}
+import React from 'react';
+import { ClientTabsProps } from '@/types';
+import { motion } from 'framer-motion';
 
 export default function ClientTabs({ tabs, activeTab, onTabChange }: ClientTabsProps) {
   return (
-    <div className="no-scrollbar mt-6 flex w-full overflow-x-auto border-b border-zinc-800 px-6">
-      {tabs.map((tab) => (
-        <button
-          key={tab}
-          onClick={() => onTabChange(tab)}
-          className={`px-6 py-4 text-sm font-bold whitespace-nowrap transition-all ${
-            activeTab === tab
-              ? 'border-primary border-b-2 text-white'
-              : 'border-b-2 border-transparent text-zinc-500 hover:text-zinc-300'
-          }`}
-        >
-          {tab}
-        </button>
-      ))}
+    <div className="mt-4 border-b border-zinc-800">
+      <div className="flex w-full">
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab;
+          return (
+            <button
+              key={tab}
+              onClick={() => onTabChange(tab)}
+              className={`relative flex-1 py-3 text-[11px] font-black tracking-tighter uppercase transition-all ${
+                isActive ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'
+              }`}
+            >
+              {tab}
+              {isActive && (
+                <motion.div
+                  layoutId="activeTabUnderline"
+                  className="bg-primary absolute right-0 bottom-0 left-0 h-0.5"
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                />
+              )}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

@@ -1,11 +1,10 @@
-
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 // 1. Usuarios del Sistema (Administradores/Técnicos)
@@ -26,64 +25,67 @@ enum Role {
 
 // 2. Clientes (Comercios/Empresas)
 model Client {
-  id           String         @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
-  ownerName    String?
-  email        String?        @unique
-  phone        String?
-  address      String
-  between      String?        // Entre calles
-  status       ClientStatus   @default(ACTIVE)
-  notes        String?
-  
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  ownerName   String?
+  phone       String?
+  address     String
+  between     String? // Entre calles
+  status      ClientStatus @default(ACTIVE)
+  notes       String?
+  latitude    Float?
+  longitude   Float?
+  imageUrl    String?
+  serviceCost Float?       @default(0)
+
   // Relaciones
   installations Installation[]
   payments      Payment[]
-  
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum ClientStatus {
   ACTIVE
-  OVERDUE    // Vencido
-  WARNING    // Proximo vencimiento
-  INACTIVE   // Desactivado
+  OVERDUE // Vencido
+  WARNING // Proximo vencimiento
+  INACTIVE // Desactivado
 }
 
 // 3. Instalaciones / Datos Técnicos
 model Installation {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  clientId        String   @db.ObjectId
-  client          Client   @relation(fields: [clientId], references: [id])
-  
-  equipmentCount  Int      @default(1)
-  ipPort          String?  // Ej: 192.168.1.1:8080
-  techNotes       String?
-  
-  installedAt     DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  clientId String @db.ObjectId
+  client   Client @relation(fields: [clientId], references: [id])
+
+  equipmentCount Int     @default(1)
+  ipPort         String? // Ej: 192.168.1.1:8080
+  techNotes      String?
+
+  installedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 // 4. Cobros / Pagos
 model Payment {
-  id            String        @id @default(auto()) @map("_id") @db.ObjectId
-  clientId      String        @db.ObjectId
-  client        Client        @relation(fields: [clientId], references: [id])
-  
-  amount        Float
-  currency      String        @default("ARS")
-  status        PaymentStatus @default(PENDING)
-  method        PaymentMethod @default(TRANSFER)
-  
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  clientId String @db.ObjectId
+  client   Client @relation(fields: [clientId], references: [id])
+
+  amount   Float
+  currency String        @default("ARS")
+  status   PaymentStatus @default(PENDING)
+  method   PaymentMethod @default(TRANSFER)
+
   // Referencia o comprobante interno
-  referenceId   String?       @unique
-  description   String?       // Ej: Renovación Mayo 2024
-  
-  paidAt        DateTime?
-  period        DateTime?     // Mes que cubre el pago
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  referenceId String?
+  description String? // Ej: Renovación Mayo 2024
+
+  paidAt    DateTime?
+  period    DateTime? // Mes que cubre el pago
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 enum PaymentStatus {
@@ -99,4 +101,3 @@ enum PaymentMethod {
   DEBIT_CARD
   CREDIT_CARD
 }
-

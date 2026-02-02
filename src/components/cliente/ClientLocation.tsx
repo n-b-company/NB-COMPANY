@@ -2,9 +2,37 @@ import React from 'react';
 import { MapPin, Navigation, Map as MapIcon } from 'lucide-react';
 import Image from 'next/image';
 
-export default function ClientLocation() {
+interface ClientLocationProps {
+  latitude?: number;
+  longitude?: number;
+  address?: string;
+  between?: string;
+}
+
+export default function ClientLocation({
+  latitude,
+  longitude,
+  address,
+  between,
+}: ClientLocationProps) {
+  const hasCoords = latitude && longitude;
+
+  const handleNavigate = () => {
+    if (hasCoords) {
+      window.open(
+        `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`,
+        '_blank',
+      );
+    } else if (address) {
+      window.open(
+        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`,
+        '_blank',
+      );
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       {/* Mini Map View */}
       <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 shadow-xl">
         <Image
@@ -19,14 +47,14 @@ export default function ClientLocation() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
           <div className="relative">
             <div className="bg-primary/20 absolute -inset-4 animate-ping rounded-full" />
-            <div className="bg-primary relative rotate-45 transform rounded-2xl border-2 border-emerald-400 p-3 text-zinc-950 shadow-2xl">
+            <div className="bg-primary border-primary-foreground relative rotate-45 transform rounded-2xl border-2 p-3 text-zinc-950 shadow-2xl">
               <MapPin size={24} className="-rotate-45 transform" strokeWidth={3} />
             </div>
           </div>
         </div>
 
         {/* Floating Info */}
-        <div className="absolute right-4 bottom-4 left-4 flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-950/80 p-4 backdrop-blur-md">
+        <div className="absolute right-4 bottom-4 left-4 flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-950/80 p-3 backdrop-blur-md">
           <div className="flex items-center gap-3">
             <div className="text-primary rounded-xl border border-zinc-800 bg-zinc-900 p-2">
               <MapIcon size={20} />
@@ -35,37 +63,42 @@ export default function ClientLocation() {
               <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
                 Coordenadas
               </p>
-              <p className="text-xs font-bold text-white">-34.6037, -58.3816</p>
+              <p className="text-xs font-bold text-white">
+                {hasCoords ? `${latitude.toFixed(6)}, ${longitude.toFixed(6)}` : 'No registradas'}
+              </p>
             </div>
           </div>
-          <button className="bg-primary flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black text-zinc-950 uppercase transition-all hover:brightness-110">
-            <Navigation size={14} fill="currentColor" />
+          <button
+            onClick={handleNavigate}
+            className="bg-primary flex items-center gap-2 rounded-xl px-3 py-1.5 text-[10px] font-black text-zinc-950 uppercase transition-all hover:brightness-110 active:scale-95"
+          >
+            <Navigation size={12} fill="currentColor" />
             Navegar
           </button>
         </div>
       </div>
 
       {/* Address Details */}
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
-        <h4 className="mb-4 flex items-center gap-2 font-bold text-white">
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
+        <h4 className="mb-3 flex items-center gap-2 font-bold text-white">
           <MapPin size={18} className="text-primary" />
           Detalles de Ubicación
         </h4>
         <div className="space-y-4">
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-0.5">
             <span className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
               Dirección Principal
             </span>
-            <p className="font-medium text-white">Av. Corrientes 1234, CABA</p>
+            <p className="text-sm font-medium text-white">{address || 'No registrada'}</p>
           </div>
-          <div className="flex flex-col gap-1 pt-2">
-            <span className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
-              Referencias
-            </span>
-            <p className="text-sm text-zinc-400">
-              Portón negro grande al lado del kiosco. Tocar timbre 4B.
-            </p>
-          </div>
+          {between && (
+            <div className="flex flex-col gap-0.5 pt-1">
+              <span className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
+                Entre Calles / Referencias
+              </span>
+              <p className="text-xs text-zinc-400">{between}</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
