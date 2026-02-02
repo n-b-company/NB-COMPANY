@@ -24,6 +24,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           className={`mb-2 block text-sm font-medium ${error ? 'text-red-400' : 'text-zinc-400'}`}
         >
           {label}
+          {!props.required && props.required !== undefined && (
+            <span className="ml-1 text-[10px] font-normal text-zinc-500">(Opcional)</span>
+          )}
         </label>
         <input
           id={id}
@@ -50,6 +53,9 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           className={`mb-2 block text-sm font-medium ${error ? 'text-red-400' : 'text-zinc-400'}`}
         >
           {label}
+          {!props.required && props.required !== undefined && (
+            <span className="ml-1 text-[10px] font-normal text-zinc-500">(Opcional)</span>
+          )}
         </label>
         <select
           id={id}
@@ -83,6 +89,9 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           className={`mb-2 block text-sm font-medium ${error ? 'text-red-400' : 'text-zinc-400'}`}
         >
           {label}
+          {!props.required && props.required !== undefined && (
+            <span className="ml-1 text-[10px] font-normal text-zinc-500">(Opcional)</span>
+          )}
         </label>
         <textarea
           id={id}

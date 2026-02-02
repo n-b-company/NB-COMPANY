@@ -28,6 +28,7 @@ export default function NuevaInstalacionPage() {
       nombre: '',
       propietario: '',
       direccion: '',
+      telefono: '',
       entre_calles: '',
       cantidad_equipos: 1,
       ip_puerto: '',
@@ -83,7 +84,7 @@ export default function NuevaInstalacionPage() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         {/* Captura de Imagen y Fecha */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="flex flex-col gap-6">
           <Controller
             name="image_url"
             control={control}
@@ -93,6 +94,7 @@ export default function NuevaInstalacionPage() {
                 value={field.value}
                 onImageCapture={(base64) => field.onChange(base64)}
                 error={errors.image_url?.message}
+                required={false}
               />
             )}
           />
@@ -127,6 +129,7 @@ export default function NuevaInstalacionPage() {
                     setValue('longitude', coords?.lng ?? null);
                   }}
                   error={errors.latitude?.message || errors.longitude?.message}
+                  required={false}
                 />
               )}
             />
@@ -135,7 +138,7 @@ export default function NuevaInstalacionPage() {
 
         {/* Datos del Comercio */}
         <FormSection title="información del comercio" icon={Store}>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="flex flex-col gap-6">
             <Input
               id="nombre"
               label="Nombre del Comercio"
@@ -150,6 +153,13 @@ export default function NuevaInstalacionPage() {
               {...register('propietario')}
               error={errors.propietario?.message}
             />
+            <Input
+              id="telefono"
+              label="Teléfono / WhatsApp"
+              placeholder="Ej: 1122334455"
+              {...register('telefono')}
+              error={errors.telefono?.message}
+            />
           </div>
 
           <Input
@@ -160,13 +170,14 @@ export default function NuevaInstalacionPage() {
             error={errors.direccion?.message}
           />
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="flex flex-col gap-6">
             <Input
               id="entre_calles"
               label="Entre Calles"
               placeholder="Ej: Mitre y Belgrano"
               {...register('entre_calles')}
               error={errors.entre_calles?.message}
+              required={false}
             />
             <Input
               id="cantidad_equipos"
@@ -188,6 +199,7 @@ export default function NuevaInstalacionPage() {
             placeholder="Ej: 192.168.1.1:8080"
             {...register('ip_puerto')}
             error={errors.ip_puerto?.message}
+            required={false}
           />
 
           <Textarea
@@ -197,6 +209,7 @@ export default function NuevaInstalacionPage() {
             rows={3}
             {...register('notas')}
             error={errors.notas?.message}
+            required={false}
           />
         </FormSection>
 

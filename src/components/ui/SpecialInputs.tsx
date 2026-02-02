@@ -7,7 +7,13 @@ import { ImageCaptureProps, LocationCaptureProps, DatePickerProps } from '@/type
 
 // --- Image Capture Component ---
 
-export const ImageCapture = ({ label, onImageCapture, error, value }: ImageCaptureProps) => {
+export const ImageCapture = ({
+  label,
+  onImageCapture,
+  error,
+  value,
+  required,
+}: ImageCaptureProps) => {
   const [preview, setPreview] = useState<string | null>(value || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -34,6 +40,9 @@ export const ImageCapture = ({ label, onImageCapture, error, value }: ImageCaptu
     <div className="space-y-2">
       <label className={`block text-sm font-medium ${error ? 'text-red-400' : 'text-zinc-400'}`}>
         {label}
+        {!required && required !== undefined && (
+          <span className="ml-1 text-[10px] font-normal text-zinc-500">(Opcional)</span>
+        )}
       </label>
 
       <div
@@ -96,6 +105,7 @@ export const LocationCapture = ({
   onLocationCapture,
   error,
   value,
+  required,
 }: LocationCaptureProps) => {
   const [loading, setLoading] = useState(false);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(value || null);
@@ -128,6 +138,9 @@ export const LocationCapture = ({
     <div className="space-y-2">
       <label className={`block text-sm font-medium ${error ? 'text-red-400' : 'text-zinc-400'}`}>
         {label}
+        {!required && required !== undefined && (
+          <span className="ml-1 text-[10px] font-normal text-zinc-500">(Opcional)</span>
+        )}
       </label>
       <div
         className={`flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900 p-3 shadow-inner ${error ? 'border-red-500/50' : ''}`}
@@ -174,7 +187,14 @@ export const LocationCapture = ({
 
 // --- Modern Date Picker ---
 
-export const ModernDatePicker = ({ label, value, onChange, error, id }: DatePickerProps) => {
+export const ModernDatePicker = ({
+  label,
+  value,
+  onChange,
+  error,
+  id,
+  required,
+}: DatePickerProps) => {
   return (
     <div className="space-y-2">
       <label
@@ -182,6 +202,9 @@ export const ModernDatePicker = ({ label, value, onChange, error, id }: DatePick
         className={`block text-sm font-medium ${error ? 'text-red-400' : 'text-zinc-400'}`}
       >
         {label}
+        {!required && required !== undefined && (
+          <span className="ml-1 text-[10px] font-normal text-zinc-500">(Opcional)</span>
+        )}
       </label>
       <div className="relative">
         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-500">

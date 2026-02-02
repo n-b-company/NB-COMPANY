@@ -19,6 +19,8 @@ export interface StatsGridProps {
   active: number;
   warning: number;
   overdue: number;
+  activeStatus?: string | null;
+  onStatusChange?: (status: string | null) => void;
 }
 
 export interface StatItemProps {
@@ -74,17 +76,20 @@ export interface FormSectionProps {
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   error?: string;
+  required?: boolean;
 }
 
 export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label: string;
   options: { value: string; label: string }[];
   error?: string;
+  required?: boolean;
 }
 
 export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
   error?: string;
+  required?: boolean;
 }
 
 export interface InfoItem {
@@ -110,6 +115,7 @@ export interface ImageCaptureProps {
   onImageCapture: (base64: string | null) => void;
   error?: string;
   value?: string;
+  required?: boolean;
 }
 
 export interface LocationCaptureProps {
@@ -117,6 +123,7 @@ export interface LocationCaptureProps {
   onLocationCapture: (coords: { lat: number; lng: number } | null) => void;
   error?: string;
   value?: { lat: number; lng: number } | null;
+  required?: boolean;
 }
 
 export interface DatePickerProps {
@@ -125,6 +132,7 @@ export interface DatePickerProps {
   onChange: (date: string) => void;
   error?: string;
   id?: string;
+  required?: boolean;
 }
 
 export interface TicketData {

@@ -28,7 +28,7 @@ model Client {
   id        String       @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   ownerName String?
-  email     String?      @unique
+  email     String?
   phone     String?
   address   String
   between   String? // Entre calles

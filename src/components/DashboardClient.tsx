@@ -15,6 +15,7 @@ interface DashboardClientProps {
 
 export default function DashboardClient({ initialClients }: DashboardClientProps) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState<string | null>(null);
 
   // Calculate stats based on initial data
   const stats = useMemo(() => {
@@ -25,22 +26,37 @@ export default function DashboardClient({ initialClients }: DashboardClientProps
     };
   }, [initialClients]);
 
-  // Filter clients based on search term
+  // Filter clients based on search term and status
   const filteredClients = useMemo(() => {
-    if (!searchTerm) return initialClients.slice(0, 10);
-    const lowSearch = searchTerm.toLowerCase();
-    return initialClients
-      .filter(
+    let result = initialClients;
+
+    // Filter by status if one is active
+    if (filterStatus) {
+      result = result.filter((c) => c.status === filterStatus);
+    }
+
+    // Filter by search term
+    if (searchTerm) {
+      const lowSearch = searchTerm.toLowerCase();
+      result = result.filter(
         (c) =>
           c.name.toLowerCase().includes(lowSearch) || c.address.toLowerCase().includes(lowSearch),
-      )
-      .slice(0, 10);
-  }, [searchTerm, initialClients]);
+      );
+    }
+
+    return result.slice(0, 10);
+  }, [searchTerm, filterStatus, initialClients]);
 
   return (
     <div className="my-4 px-6 py-8">
       {/* KPI Cards */}
-      <StatsGrid active={stats.active} warning={stats.warning} overdue={stats.overdue} />
+      <StatsGrid
+        active={stats.active}
+        warning={stats.warning}
+        overdue={stats.overdue}
+        activeStatus={filterStatus}
+        onStatusChange={setFilterStatus}
+      />
 
       {/* Search Bar */}
       <div className="mb-8">
