@@ -1,16 +1,4 @@
-import { LucideIcon } from 'lucide-react';
-
-export interface InfoItem {
-  label: string;
-  value?: string;
-  subValue?: string;
-  icon: LucideIcon;
-  special?: boolean;
-}
-
-interface InfoGridProps {
-  items: InfoItem[];
-}
+import { InfoGridProps } from '@/types';
 
 export default function InfoGrid({ items }: InfoGridProps) {
   return (

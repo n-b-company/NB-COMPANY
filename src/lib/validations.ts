@@ -23,6 +23,10 @@ export const instalacionSchema = z.object({
     .min(1, 'Debe haber al menos 1 equipo'),
   ip_puerto: z.string().optional(),
   notas: z.string().optional(),
+  latitude: z.number().optional().nullable(),
+  longitude: z.number().optional().nullable(),
+  image_url: z.string().optional(),
+  fecha_instalacion: z.string().min(1, 'La fecha es obligatoria'),
 });
 
 export type InstalacionFormValues = z.infer<typeof instalacionSchema>;

@@ -1,18 +1,6 @@
 import React from 'react';
 import { CheckCircle2, CalendarClock } from 'lucide-react';
-
-export interface TicketData {
-  id: string;
-  empresa: string;
-  fecha: string;
-  monto: string;
-  status: 'Aprobado' | 'Pendiente' | 'Rechazado';
-  proximoVencimiento: string;
-}
-
-interface TicketCardProps {
-  data: TicketData;
-}
+import { TicketCardProps } from '@/types';
 
 export default function TicketCard({ data }: TicketCardProps) {
   return (

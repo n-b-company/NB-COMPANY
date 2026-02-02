@@ -1,13 +1,7 @@
 'use client';
 
 import React from 'react';
-import { LucideIcon } from 'lucide-react';
-
-interface FormSectionProps {
-  title: string;
-  icon: LucideIcon;
-  children: React.ReactNode;
-}
+import { FormSectionProps, InputProps, SelectProps, TextareaProps } from '@/types';
 
 export const FormSection = ({ title, icon: Icon, children }: FormSectionProps) => {
   return (
@@ -20,11 +14,6 @@ export const FormSection = ({ title, icon: Icon, children }: FormSectionProps) =
     </section>
   );
 };
-
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
-  error?: string;
-}
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ label, id, error, ...props }, ref) => {
@@ -51,12 +40,6 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 );
 
 Input.displayName = 'Input';
-
-interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
-  label: string;
-  options: { value: string; label: string }[];
-  error?: string;
-}
 
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ label, id, options, error, ...props }, ref) => {
@@ -90,11 +73,6 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 );
 
 Select.displayName = 'Select';
-
-interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  label: string;
-  error?: string;
-}
 
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ label, id, error, ...props }, ref) => {

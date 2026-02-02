@@ -1,12 +1,6 @@
 import React from 'react';
 import { Info } from 'lucide-react';
-
-interface AccountSummaryProps {
-  vencimiento: string;
-  saldoPendiente: string;
-  ultimoPago: string;
-  notas: string;
-}
+import { AccountSummaryProps } from '@/types';
 
 export default function AccountSummary({
   vencimiento,

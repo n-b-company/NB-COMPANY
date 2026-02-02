@@ -1,13 +1,5 @@
-import React from 'react';
 import { Search } from 'lucide-react';
-
-interface SearchBarProps {
-  placeholder?: string;
-  value: string;
-  onChange: (value: string) => void;
-  className?: string;
-  variant?: 'default' | 'glass';
-}
+import { SearchBarProps } from '@/types';
 
 export default function SearchBar({
   placeholder = 'Buscar...',

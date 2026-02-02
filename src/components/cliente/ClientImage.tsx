@@ -1,10 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-
-interface ClientImageProps {
-  src: string;
-  alt: string;
-}
+import { ClientImageProps } from '@/types';
 
 export default function ClientImage({ src, alt }: ClientImageProps) {
   return (

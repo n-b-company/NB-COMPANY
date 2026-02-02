@@ -1,10 +1,5 @@
 import React from 'react';
-
-interface ClientTabsProps {
-  tabs: string[];
-  activeTab: string;
-  onTabChange: (tab: string) => void;
-}
+import { ClientTabsProps } from '@/types';
 
 export default function ClientTabs({ tabs, activeTab, onTabChange }: ClientTabsProps) {
   return (

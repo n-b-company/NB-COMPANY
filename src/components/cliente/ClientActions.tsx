@@ -1,11 +1,6 @@
 import React from 'react';
 import { MessageCircle, RefreshCw, Trash2 } from 'lucide-react';
-
-interface ClientActionsProps {
-  onWhatsApp: () => void;
-  onRenew: () => void;
-  onDeactivate: () => void;
-}
+import { ClientActionsProps } from '@/types';
 
 export default function ClientActions({ onWhatsApp, onRenew, onDeactivate }: ClientActionsProps) {
   return (

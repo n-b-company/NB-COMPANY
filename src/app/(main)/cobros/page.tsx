@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { ReceiptText, Receipt, CreditCard, Calendar } from 'lucide-react';
 import { CLIENTES_MOCK, COBROS_FILTER_OPTIONS } from '@/constants/mockData';
 import Pagination from '@/components/ui/Pagination';
-import EntityCard, { StatusVariant } from '@/components/ui/EntityCard';
+import EntityCard from '@/components/ui/EntityCard';
+import { StatusVariant } from '@/types';
 import SearchBar from '@/components/ui/SearchBar';
 import FilterGroup from '@/components/ui/FilterGroup';
 

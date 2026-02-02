@@ -1,12 +1,6 @@
 import React from 'react';
 import { ArrowLeft, BadgeCheck } from 'lucide-react';
-
-interface ClientHeaderProps {
-  name: string;
-  id: string;
-  statusText: string;
-  onBack: () => void;
-}
+import { ClientHeaderProps } from '@/types';
 
 export default function ClientHeader({ name, id, statusText, onBack }: ClientHeaderProps) {
   return (

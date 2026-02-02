@@ -4,7 +4,8 @@ import React from 'react';
 import { Share2, Download, Bell, UserCircle2, X, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import TicketCard, { TicketData } from '@/components/ui/TicketCard';
+import TicketCard from '@/components/ui/TicketCard';
+import { TicketData } from '@/types';
 
 const MOCK_TICKET_DATA: TicketData = {
   id: 'AR-8829420-X',
