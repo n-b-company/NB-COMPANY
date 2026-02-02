@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import SearchBar from '@/components/ui/SearchBar';
 import EntityCard from '@/components/ui/EntityCard';
 import StatsGrid from '@/components/ui/StatsGrid';
+import AppTour from '@/components/AppTour';
 import { Store as StoreIcon } from 'lucide-react';
 import Link from 'next/link';
 import { STATUS_MAP, STATUS_TEXT_MAP } from '@/constants/constants';
@@ -67,17 +68,20 @@ export default function DashboardClient({ initialClients }: DashboardClientProps
 
   return (
     <div className="my-4 px-6 py-8">
+      <AppTour />
       {/* KPI Cards */}
-      <StatsGrid
-        active={stats.active}
-        warning={stats.warning}
-        overdue={stats.overdue}
-        activeStatus={filterStatus}
-        onStatusChange={setFilterStatus}
-      />
+      <div id="dashboard-stats">
+        <StatsGrid
+          active={stats.active}
+          warning={stats.warning}
+          overdue={stats.overdue}
+          activeStatus={filterStatus}
+          onStatusChange={setFilterStatus}
+        />
+      </div>
 
       {/* Search Bar */}
-      <div className="mb-8">
+      <div className="mb-8" id="dashboard-search">
         <SearchBar
           placeholder="Buscar por nombre o dirección..."
           value={searchTerm}
@@ -99,7 +103,7 @@ export default function DashboardClient({ initialClients }: DashboardClientProps
       </div>
 
       {/* List Items from filtered data */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3" id="dashboard-list">
         {filteredClients.length > 0 ? (
           filteredClients.map((client) => (
             <EntityCard

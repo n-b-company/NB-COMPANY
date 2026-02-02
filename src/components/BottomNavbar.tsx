@@ -19,6 +19,7 @@ export default function BottomNavbar() {
               <Link
                 key={item.href}
                 href={item.href}
+                id="nav-action-btn"
                 className="relative -top-8 flex flex-col items-center gap-1.5"
               >
                 <div className="bg-primary group flex h-16 w-16 items-center justify-center rounded-2xl text-zinc-950 shadow-[0_8px_30px_rgb(31,219,100,0.3)] transition-all hover:scale-105 active:scale-90">
@@ -35,6 +36,7 @@ export default function BottomNavbar() {
             <Link
               key={item.href}
               href={item.href}
+              id={`nav-item-${item.href === '/' ? 'home' : item.href.replace('/', '')}`}
               className={`group relative flex flex-1 flex-col items-center gap-1.5 transition-all ${
                 isActive ? 'text-primary' : 'text-zinc-500'
               }`}
