@@ -15,7 +15,16 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'upload-images.api.appwiseinnovations.com',
+      },
     ],
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '5MB',
+    },
   },
 };
 

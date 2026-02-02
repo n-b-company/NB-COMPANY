@@ -43,7 +43,11 @@ export default function LoginPage() {
         toast.error(result.error);
       }
     } catch (err) {
-      console.error(err);
+      // Si es un error de Next.js redirect, no hacemos nada (es el comportamiento esperado)
+      if (err instanceof Error && err.message === 'NEXT_REDIRECT') {
+        throw err;
+      }
+      console.error('Login error:', err);
       toast.error('Ocurrió un error inesperado');
     } finally {
       setIsLoading(false);
@@ -79,7 +83,7 @@ export default function LoginPage() {
               <Input
                 id="user"
                 label="Usuario"
-                placeholder="Usuario"
+                placeholder="nbadmin"
                 {...register('username')}
                 error={errors.username?.message}
               />
@@ -88,7 +92,7 @@ export default function LoginPage() {
                 id="password"
                 label="Contraseña"
                 type="password"
-                placeholder="Contraseña"
+                placeholder="nbdev2026"
                 {...register('password')}
                 error={errors.password?.message}
               />

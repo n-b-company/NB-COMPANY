@@ -1,31 +1,13 @@
 import React from 'react';
-import { LucideIcon, ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
-
-export type StatusVariant = 'success' | 'warning' | 'danger' | 'inactive';
-
-interface EntityCardProps {
-  icon?: LucideIcon;
-  title: string;
-  subtitle?: string;
-  statusText?: string;
-  statusVariant?: StatusVariant;
-  amount?: string;
-  metadata?: { icon: LucideIcon; text: string }[];
-  actionHref?: string;
-  headerLabel?: string;
-  className?: string;
-}
-
-const statusStyles: Record<StatusVariant, string> = {
-  success: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-500',
-  warning: 'border-amber-500/20 bg-amber-500/10 text-amber-500',
-  danger: 'border-red-500/20 bg-red-500/10 text-red-500',
-  inactive: 'border-zinc-700 bg-zinc-800 text-zinc-500',
-};
+import Image from 'next/image';
+import { EntityCardProps } from '@/types';
+import { STATUS_STYLES } from '@/constants/constants';
 
 export default function EntityCard({
   icon: Icon,
+  imageUrl,
   title,
   subtitle,
   statusText,
@@ -48,14 +30,23 @@ export default function EntityCard({
         </div>
       )}
 
-      <div className="flex flex-col gap-4 p-4">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            {Icon && (
-              <div className="group-hover:text-primary flex size-11 shrink-0 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-500 transition-colors">
-                <Icon size={20} />
+      <div className="flex flex-col gap-4 p-5">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-4">
+            {imageUrl ? (
+              <div className="relative size-12 shrink-0 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950">
+                <Image
+                  src={imageUrl}
+                  alt={title}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                />
               </div>
-            )}
+            ) : Icon ? (
+              <div className="group-hover:text-primary flex size-12 shrink-0 items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-950 text-zinc-500 shadow-inner transition-colors">
+                <Icon size={22} />
+              </div>
+            ) : null}
             <div className="min-w-0">
               <h4 className="group-hover:text-primary truncate text-sm font-black text-white transition-colors">
                 {title}
@@ -68,22 +59,32 @@ export default function EntityCard({
             </div>
           </div>
 
-          <div className="flex shrink-0 flex-col items-end gap-1.5 text-right">
-            {amount && <p className="text-sm font-black text-white">{amount}</p>}
-            {statusText && (
-              <span
-                className={`rounded-full border px-2 py-0.5 text-[9px] font-black tracking-tighter uppercase ${statusStyles[statusVariant]}`}
-              >
-                {statusText}
-              </span>
+          <div className="flex shrink-0 items-center gap-3">
+            <div className="flex flex-col items-end gap-1 text-right">
+              {amount && <p className="text-xs font-black text-white">{amount}</p>}
+              {statusText && (
+                <span
+                  className={`rounded-full border px-2 py-0.5 text-[9px] font-black tracking-tighter uppercase ${STATUS_STYLES[statusVariant]}`}
+                >
+                  {statusText}
+                </span>
+              )}
+            </div>
+
+            {/* Botón de acción integrado arriba si no hay metadata */}
+            {actionHref && !metadata && (
+              <div className="hover:text-primary hover:border-primary flex size-8 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-950 text-zinc-500 transition-all active:scale-90">
+                <ArrowUpRight size={16} />
+              </div>
             )}
           </div>
         </div>
 
-        {(metadata || actionHref) && (
+        {/* Solo mostrar abajo si hay metadata (detalles mas complejos) */}
+        {metadata && metadata.length > 0 && (
           <div className="flex items-center justify-between border-t border-zinc-800/50 pt-3">
             <div className="flex items-center gap-4">
-              {metadata?.map((item, idx) => (
+              {metadata.map((item, idx) => (
                 <div key={idx} className="flex items-center gap-1.5 text-zinc-500">
                   <item.icon size={14} />
                   <span className="text-[10px] font-bold uppercase">{item.text}</span>

@@ -1,18 +1,6 @@
 import React from 'react';
 import { CheckCircle2, CalendarClock } from 'lucide-react';
-
-export interface TicketData {
-  id: string;
-  empresa: string;
-  fecha: string;
-  monto: string;
-  status: 'Aprobado' | 'Pendiente' | 'Rechazado';
-  proximoVencimiento: string;
-}
-
-interface TicketCardProps {
-  data: TicketData;
-}
+import { TicketCardProps } from '@/types';
 
 export default function TicketCard({ data }: TicketCardProps) {
   return (
@@ -41,7 +29,7 @@ export default function TicketCard({ data }: TicketCardProps) {
           <p className="text-sm font-medium text-zinc-500">Monto Total</p>
           <p className="text-xl font-black text-white">{data.monto}</p>
         </div>
-        <div className="flex items-center justify-between py-4">
+        <div className="flex items-center justify-between border-b border-zinc-800/30 py-4">
           <p className="text-sm font-medium text-zinc-500">Estado</p>
           <span
             className={`rounded-full border px-3 py-1 text-[10px] font-black tracking-wider uppercase ${
@@ -52,6 +40,10 @@ export default function TicketCard({ data }: TicketCardProps) {
           >
             {data.status}
           </span>
+        </div>
+        <div className="flex items-center justify-between py-4">
+          <p className="text-sm font-medium text-zinc-500">Próximo Vencimiento</p>
+          <p className="text-sm font-bold text-zinc-100">{data.proximoVencimiento}</p>
         </div>
       </div>
 

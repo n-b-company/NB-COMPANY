@@ -53,22 +53,21 @@ body {
 .phone-frame {
   @apply relative mx-auto overflow-hidden bg-zinc-950 shadow-2xl transition-all duration-300;
   width: 100%;
+  max-width: 500px; /* Constrain width even on smaller desktops/tablets */
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 @media (min-width: 768px) {
   .phone-frame {
-    width: 450px;
-    height: 90vh;
+    height: 92vh;
     min-height: 800px;
-    margin-top: 5vh;
-    border-radius: 3rem;
-    border: 8px solid #18181b;
-  }
-}
-
-@media (min-width: 1200px) {
-  .phone-frame {
-    width: 500px;
+    margin-top: 4vh;
+    border-radius: 3.5rem;
+    border: 12px solid #18181b;
+    box-shadow:
+      0 0 0 2px #27272a,
+      0 25px 50px -12px rgba(0, 0, 0, 0.5);
   }
 }
