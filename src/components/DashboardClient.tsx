@@ -4,10 +4,11 @@ import { useState, useMemo } from 'react';
 import SearchBar from '@/components/ui/SearchBar';
 import EntityCard from '@/components/ui/EntityCard';
 import StatsGrid from '@/components/ui/StatsGrid';
-import { Store } from 'lucide-react';
+import { Store as StoreIcon } from 'lucide-react';
 import Link from 'next/link';
 import { STATUS_MAP, STATUS_TEXT_MAP } from '@/constants/constants';
 import { Client } from '@/types';
+import { calculateDynamicStatus, getStatusCounts } from '@/lib/utils/status-calculator';
 
 interface DashboardClientProps {
   initialClients: Client[];
@@ -17,22 +18,39 @@ export default function DashboardClient({ initialClients }: DashboardClientProps
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
 
-  // Calculate stats based on initial data
+  // Calculate dynamic counts
   const stats = useMemo(() => {
+    const counts = getStatusCounts(initialClients);
     return {
-      active: initialClients.filter((c) => c.status === 'ACTIVE').length,
-      warning: initialClients.filter((c) => c.status === 'WARNING').length,
-      overdue: initialClients.filter((c) => c.status === 'OVERDUE').length,
+      active: counts.ACTIVE,
+      warning: counts.WARNING,
+      overdue: counts.OVERDUE,
     };
   }, [initialClients]);
 
   // Filter clients based on search term and status
   const filteredClients = useMemo(() => {
-    let result = initialClients;
+    // Map clients with their dynamic status
+    let result = initialClients.map((c) => {
+      const { status, daysUntilExpiration } = calculateDynamicStatus(c);
+
+      let dynamicText = STATUS_TEXT_MAP[status] || 'ACTIVO';
+      if (status === 'WARNING') {
+        dynamicText = `VENCE EN ${daysUntilExpiration} DÍAS`;
+        if (daysUntilExpiration === 0) dynamicText = 'VENCE HOY';
+        if (daysUntilExpiration === 1) dynamicText = 'VENCE MAÑANA';
+      }
+
+      return {
+        ...c,
+        dynamicStatus: status,
+        dynamicText,
+      };
+    });
 
     // Filter by status if one is active
     if (filterStatus) {
-      result = result.filter((c) => c.status === filterStatus);
+      result = result.filter((c) => c.dynamicStatus === filterStatus);
     }
 
     // Filter by search term
@@ -89,9 +107,9 @@ export default function DashboardClient({ initialClients }: DashboardClientProps
               title={client.name}
               subtitle={client.address}
               imageUrl={client.imageUrl || undefined}
-              icon={Store}
-              statusText={STATUS_TEXT_MAP[client.status] || 'ACTIVO'}
-              statusVariant={STATUS_MAP[client.status] || 'success'}
+              icon={StoreIcon}
+              statusText={client.dynamicText}
+              statusVariant={STATUS_MAP[client.dynamicStatus] || 'success'}
               actionHref={`/cliente/${client.id}`}
             />
           ))

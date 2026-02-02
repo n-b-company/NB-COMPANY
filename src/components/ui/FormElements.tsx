@@ -16,7 +16,7 @@ export const FormSection = ({ title, icon: Icon, children }: FormSectionProps) =
 };
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ label, id, error, ...props }, ref) => {
+  ({ label, id, error, icon: Icon, required, ...props }, ref) => {
     return (
       <div>
         <label
@@ -24,18 +24,25 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           className={`mb-2 block text-sm font-medium ${error ? 'text-red-400' : 'text-zinc-400'}`}
         >
           {label}
-          {!props.required && props.required !== undefined && (
+          {!required && required !== undefined && (
             <span className="ml-1 text-[10px] font-normal text-zinc-500">(Opcional)</span>
           )}
         </label>
-        <input
-          id={id}
-          ref={ref}
-          className={`focus:ring-primary focus:border-primary block w-full rounded-lg border bg-zinc-900 p-2.5 text-white placeholder-zinc-600 transition-colors outline-none ${
-            error ? 'border-red-500/50' : 'border-zinc-800'
-          }`}
-          {...props}
-        />
+        <div className="relative">
+          {Icon && (
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-500">
+              <Icon size={18} />
+            </div>
+          )}
+          <input
+            id={id}
+            ref={ref}
+            className={`focus:ring-primary focus:border-primary block w-full rounded-lg border bg-zinc-900 p-2.5 text-white placeholder-zinc-600 transition-colors outline-none ${
+              error ? 'border-red-500/50' : 'border-zinc-800'
+            } ${Icon ? 'pl-10' : ''}`}
+            {...props}
+          />
+        </div>
         {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
       </div>
     );
@@ -45,7 +52,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 Input.displayName = 'Input';
 
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ label, id, options, error, ...props }, ref) => {
+  ({ label, id, options, error, required, ...props }, ref) => {
     return (
       <div>
         <label
@@ -53,7 +60,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           className={`mb-2 block text-sm font-medium ${error ? 'text-red-400' : 'text-zinc-400'}`}
         >
           {label}
-          {!props.required && props.required !== undefined && (
+          {!required && required !== undefined && (
             <span className="ml-1 text-[10px] font-normal text-zinc-500">(Opcional)</span>
           )}
         </label>
@@ -81,7 +88,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 Select.displayName = 'Select';
 
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ label, id, error, ...props }, ref) => {
+  ({ label, id, error, icon: Icon, required, ...props }, ref) => {
     return (
       <div>
         <label
@@ -89,18 +96,25 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           className={`mb-2 block text-sm font-medium ${error ? 'text-red-400' : 'text-zinc-400'}`}
         >
           {label}
-          {!props.required && props.required !== undefined && (
+          {!required && required !== undefined && (
             <span className="ml-1 text-[10px] font-normal text-zinc-500">(Opcional)</span>
           )}
         </label>
-        <textarea
-          id={id}
-          ref={ref}
-          className={`focus:ring-primary focus:border-primary block w-full resize-none rounded-lg border bg-zinc-900 p-2.5 text-white placeholder-zinc-600 transition-colors outline-none ${
-            error ? 'border-red-500/50' : 'border-zinc-800'
-          }`}
-          {...props}
-        />
+        <div className="relative">
+          {Icon && (
+            <div className="pointer-events-none absolute top-3 left-0 flex items-start pl-3 text-zinc-500">
+              <Icon size={18} />
+            </div>
+          )}
+          <textarea
+            id={id}
+            ref={ref}
+            className={`focus:ring-primary focus:border-primary block w-full resize-none rounded-lg border bg-zinc-900 p-2.5 text-white placeholder-zinc-600 transition-colors outline-none ${
+              error ? 'border-red-500/50' : 'border-zinc-800'
+            } ${Icon ? 'pl-10' : ''}`}
+            {...props}
+          />
+        </div>
         {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
       </div>
     );

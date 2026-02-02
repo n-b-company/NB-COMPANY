@@ -6,11 +6,42 @@ export type StatusVariant = 'success' | 'warning' | 'danger' | 'inactive';
 export interface Client {
   id: string;
   name: string;
+  ownerName?: string | null;
+  phone?: string | null;
   address: string;
+  between?: string | null;
   status: string;
+  notes?: string | null;
   imageUrl?: string | null;
   latitude?: number | null;
   longitude?: number | null;
+  createdAt: Date;
+  updatedAt: Date;
+  installations?: Installation[];
+  payments?: Payment[];
+}
+
+export interface Installation {
+  id: string;
+  clientId: string;
+  equipmentCount: number;
+  ipPort?: string | null;
+  techNotes?: string | null;
+  installedAt: Date;
+  updatedAt: Date;
+}
+
+export interface Payment {
+  id: string;
+  clientId: string;
+  amount: number;
+  currency: string;
+  status: 'PAID' | 'PENDING' | 'REJECTED' | 'CANCELLED';
+  method: 'CASH' | 'TRANSFER' | 'DEBIT_CARD' | 'CREDIT_CARD';
+  referenceId?: string | null;
+  description?: string | null;
+  paidAt?: Date | null;
+  period?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -77,6 +108,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   label: string;
   error?: string;
   required?: boolean;
+  icon?: LucideIcon;
 }
 
 export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
@@ -90,6 +122,7 @@ export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextArea
   label: string;
   error?: string;
   required?: boolean;
+  icon?: LucideIcon;
 }
 
 export interface InfoItem {
@@ -150,6 +183,7 @@ export interface TicketCardProps {
 
 export interface AccountSummaryProps {
   vencimiento: string;
+  proximoVencimiento: string;
   saldoPendiente: string;
   ultimoPago: string;
   notas: string;
@@ -159,6 +193,7 @@ export interface ClientActionsProps {
   onWhatsApp: () => void;
   onRenew: () => void;
   onDeactivate: () => void;
+  isInactive?: boolean;
 }
 
 export interface ClientHeaderProps {

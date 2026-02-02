@@ -1,5 +1,6 @@
 'use server';
 
+import { ClientStatus } from '@prisma/client';
 import prisma from '@/lib/prisma';
 import { logout as authLogout } from '@/lib/auth';
 import { instalacionSchema, type InstalacionFormValues } from '@/lib/validations';
@@ -63,5 +64,83 @@ export async function createClientWithInstallation(data: InstalacionFormValues) 
       return { success: false, error: `Error: ${error.message}` };
     }
     return { success: false, error: 'Ocurrió un error inesperado al guardar los datos.' };
+  }
+}
+export async function updateClient(clientId: string, data: InstalacionFormValues) {
+  try {
+    const validatedData = instalacionSchema.parse(data);
+
+    let finalImageUrl: string | null = validatedData.image_url || null;
+
+    // Si tenemos una cadena base64, la subimos a la API
+    if (finalImageUrl && finalImageUrl.startsWith('data:image')) {
+      const uploadedUrl = await uploadImage(finalImageUrl);
+      if (uploadedUrl) {
+        finalImageUrl = uploadedUrl;
+      }
+    }
+
+    // 1. Actualizar Cliente
+    await prisma.client.update({
+      where: { id: clientId },
+      data: {
+        name: validatedData.nombre,
+        ownerName: validatedData.propietario,
+        phone: validatedData.telefono,
+        address: validatedData.direccion,
+        between: validatedData.entre_calles,
+        latitude: validatedData.latitude,
+        longitude: validatedData.longitude,
+        imageUrl: finalImageUrl,
+        notes: validatedData.notas,
+      },
+    });
+
+    // 2. Actualizar la primera instalación (asumiendo flujo 1:1)
+    const installation = await prisma.installation.findFirst({
+      where: { clientId },
+    });
+
+    if (installation) {
+      await prisma.installation.update({
+        where: { id: installation.id },
+        data: {
+          equipmentCount: validatedData.cantidad_equipos,
+          ipPort: validatedData.ip_puerto,
+          techNotes: validatedData.notas,
+        },
+      });
+    }
+
+    revalidatePath(`/cliente/${clientId}`);
+    revalidatePath('/clientes');
+    revalidatePath('/dashboard');
+
+    return { success: true };
+  } catch (error) {
+    if (error instanceof Error) {
+      return { success: false, error: error.message };
+    }
+    return { success: false, error: 'Error desconocido al actualizar' };
+  }
+}
+
+export async function toggleClientStatus(clientId: string, currentStatus: string) {
+  try {
+    const newStatus =
+      currentStatus === ClientStatus.INACTIVE ? ClientStatus.ACTIVE : ClientStatus.INACTIVE;
+
+    await prisma.client.update({
+      where: { id: clientId },
+      data: { status: newStatus },
+    });
+
+    revalidatePath(`/cliente/${clientId}`);
+    revalidatePath('/clientes');
+    revalidatePath('/dashboard');
+
+    return { success: true, newStatus };
+  } catch {
+    return { success: false, error: 'No se pudo cambiar el estado del cliente' };
   }
 }

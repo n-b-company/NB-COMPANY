@@ -1,9 +1,9 @@
-import React from 'react';
 import { Info } from 'lucide-react';
 import { AccountSummaryProps } from '@/types';
 
 export default function AccountSummary({
   vencimiento,
+  proximoVencimiento,
   saldoPendiente,
   ultimoPago,
   notas,
@@ -19,6 +19,10 @@ export default function AccountSummary({
           <div className="flex items-center justify-between border-b border-zinc-800/50 py-2">
             <span className="text-sm text-zinc-500">Vencimiento</span>
             <span className="text-sm font-bold text-white">{vencimiento}</span>
+          </div>
+          <div className="flex items-center justify-between border-b border-zinc-800/50 py-2">
+            <span className="text-sm text-zinc-500">Próximo Vencimiento</span>
+            <span className="text-sm font-bold text-zinc-300">{proximoVencimiento}</span>
           </div>
           <div className="flex items-center justify-between border-b border-zinc-800/50 py-2">
             <span className="text-sm text-zinc-500">Saldo Pendiente</span>
