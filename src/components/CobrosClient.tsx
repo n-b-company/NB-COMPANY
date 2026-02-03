@@ -138,7 +138,7 @@ export default function CobrosClient({ initialClients }: CobrosClientProps) {
       </div>
 
       {/* KPI Stats */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {/* Recaudación Mensual */}
         <div className="rounded-3xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur-xl">
           <div className="flex items-center justify-between">
@@ -231,16 +231,14 @@ export default function CobrosClient({ initialClients }: CobrosClientProps) {
                 key={client.id}
                 className="group relative overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/40 p-4 transition-all hover:border-zinc-700 hover:bg-zinc-900/60"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex gap-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex min-w-0 flex-1 items-center gap-4">
                     <div className="group-hover:border-primary/30 group-hover:text-primary flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-950 text-zinc-500 transition-colors">
                       <ReceiptText size={24} />
                     </div>
-                    <div>
-                      <h4 className="max-w-[150px] truncate font-bold text-white sm:max-w-xs">
-                        {client.name}
-                      </h4>
-                      <p className="text-xs text-zinc-500">{client.address}</p>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="truncate font-bold text-white">{client.name}</h4>
+                      <p className="truncate text-xs text-zinc-500">{client.address}</p>
                       <div className="mt-2 flex items-center gap-2">
                         <span
                           className={`rounded-full border px-2 py-0.5 text-[9px] font-bold ${
@@ -256,7 +254,7 @@ export default function CobrosClient({ initialClients }: CobrosClientProps) {
                       </div>
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="shrink-0 text-right">
                     <p
                       className={`text-xl font-black ${client.isPaid ? 'text-zinc-500' : 'text-white'}`}
                     >
