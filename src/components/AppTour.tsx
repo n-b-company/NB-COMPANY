@@ -12,7 +12,7 @@ export default function AppTour() {
       const driverObj = driver({
         showProgress: true,
         animate: true,
-        allowClose: false,
+        allowClose: true,
         doneBtnText: '¡Entendido!',
         nextBtnText: 'Siguiente',
         prevBtnText: 'Atrás',
@@ -76,10 +76,8 @@ export default function AppTour() {
           },
         ],
         onDestroyStarted: () => {
-          if (!driverObj.hasNextStep() || confirm('¿Quieres salir del tour?')) {
-            driverObj.destroy();
-            localStorage.setItem('has_seen_tour_v1', 'true');
-          }
+          driverObj.destroy();
+          localStorage.setItem('has_seen_tour_v1', 'true');
         },
       });
 
