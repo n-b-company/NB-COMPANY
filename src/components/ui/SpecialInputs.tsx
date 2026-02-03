@@ -87,7 +87,6 @@ export const ImageCapture = ({
         <input
           type="file"
           accept="image/*"
-          capture="environment"
           ref={fileInputRef}
           onChange={handleFileChange}
           className="hidden"
