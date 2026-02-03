@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NB COMPANY - Sistema de Gestión
 
-## Getting Started
+Sistema integral de administración para proveedores de servicios de internet y redes. Gestiona clientes, instalaciones, cobros y monitorea el estado de la red en tiempo real.
 
-First, run the development server:
+![NB Company Dashboard Banner](https://via.placeholder.com/1200x400/09090b/2866eb?text=NB+COMPANY+DASHBOARD)
+
+## 🚀 Características Principales
+
+- **Dashboard Interactivo**: KPIs en tiempo real de clientes activos, por vencer y vencidos.
+- **Gestión de Clientes**:
+  - Perfiles completos con geolocalización.
+  - Estado de cuenta automático (Activo/Alerta/Vencido).
+  - Historial de pagos y renovaciones.
+- **Sistema de Cobranzas**:
+  - Cálculo automático de montos (Servicio x Equipos).
+  - Generación de Tickets/Recibos en PDF.
+  - Envío directo de comprobantes por WhatsApp.
+- **Georreferencia**: Mapa interactivo con la ubicación de todas las instalaciones.
+- **Guía de Usuario**: Tour interactivo para nuevos usuarios (`driver.js`).
+- **Diseño Premium**: Interfaz moderna, oscura y responsiva (Mobile-First).
+
+## 🛠️ Stack Tecnológico
+
+- **Frontend**: [Next.js 16](https://nextjs.org/) (App Router), [React 19](https://react.dev/).
+- **Lenguaje**: [TypeScript](https://www.typescriptlang.org/).
+- **Estilos**: [Tailwind CSS v4](https://tailwindcss.com/), [Framer Motion](https://www.framer.com/motion/).
+- **Base de Datos**: [MongoDB](https://www.mongodb.com/) (vía [Prisma ORM](https://www.prisma.io/)).
+- **UI Components**: [Lucide React](https://lucide.dev/), [Sonner](https://sonner.emilkowal.ski/).
+- **Utilidades**: `jspdf`, `html-to-image`, `zod`, `react-hook-form`.
+
+## ⚙️ Instalación y Configuración
+
+### Prerrequisitos
+
+- Node.js 18+
+- pnpm (recomendado) o npm
+- Base de datos MongoDB (URL de conexión)
+
+### 1. Clonar el repositorio
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/n-b-company/NB-COMPANY.git
+cd nb-company
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Instalar dependencias
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Configurar Variables de Entorno
 
-## Learn More
+Crea un archivo `.env` en la raíz del proyecto basándote en el siguiente ejemplo:
 
-To learn more about Next.js, take a look at the following resources:
+```env
+# Conexión a Base de Datos (MongoDB)
+DATABASE_URL="mongodb+srv://usuario:password@cluster.mongodb.net/nb-company"
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Secretos de Autenticación
+JWT_SECRET="tu_super_secreto_aqui"
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 4. Inicializar Base de Datos
 
-## Deploy on Vercel
+Generar el cliente de Prisma:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npx prisma generate
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 5. Correr el servidor de desarrollo
+
+```bash
+pnpm dev
+```
+
+La aplicación estará disponible en `http://localhost:3000`.
+
+## 📜 Scripts Disponibles
+
+- `pnpm dev`: Inicia el servidor de desarrollo.
+- `pnpm build`: Construye la aplicación para producción (incluye generación de Prisma).
+- `pnpm start`: Inicia el servidor de producción.
+- `pnpm lint`: Ejecuta el linter para verificar el código.
+- `pnpm format`: Formatea el código usando Prettier.
+
+## 📂 Estructura del Proyecto
+
+```
+src/
+├── app/              # Rutas de la aplicación (Next.js App Router)
+│   ├── (auth)/       # Rutas de autenticación (Login)
+│   ├── (main)/       # Rutas principales (Dashboard, Clientes, etc.)
+│   └── comprobante/  # Vista de ticket (aislada)
+├── components/       # Componentes de UI reutilizables
+├── lib/              # Utilidades, configuraciones y Server Actions
+├── types/            # Definiciones de tipos TypeScript
+└── constants/        # Constantes globales
+prisma/
+└── schema.prisma     # Esquema de base de datos
+```
+
+## 🤝 Contribución
+
+1.  Haz un Fork del proyecto.
+2.  Crea una rama para tu funcionalidad (`git checkout -b feature/nueva-funcionalidad`).
+3.  Haz Commit de tus cambios (`git commit -m 'feat: agrega nueva funcionalidad'`).
+4.  Haz Push a la rama (`git push origin feature/nueva-funcionalidad`).
+5.  Abre un Pull Request.
+
+---
+
+© 2026 NB COMPANY S.A.

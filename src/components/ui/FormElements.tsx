@@ -19,15 +19,17 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ label, id, error, icon: Icon, required, ...props }, ref) => {
     return (
       <div>
-        <label
-          htmlFor={id}
-          className={`mb-2 block text-sm font-medium ${error ? 'text-red-400' : 'text-zinc-400'}`}
-        >
-          {label}
-          {!required && required !== undefined && (
-            <span className="ml-1 text-[10px] font-normal text-zinc-500">(Opcional)</span>
-          )}
-        </label>
+        {label && (
+          <label
+            htmlFor={id}
+            className={`mb-2 block text-sm font-medium ${error ? 'text-red-400' : 'text-zinc-400'}`}
+          >
+            {label}
+            {!required && required !== undefined && (
+              <span className="ml-1 text-[10px] font-normal text-zinc-500">(Opcional)</span>
+            )}
+          </label>
+        )}
         <div className="relative">
           {Icon && (
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-500">
