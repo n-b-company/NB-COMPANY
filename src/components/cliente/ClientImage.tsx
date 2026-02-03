@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { ClientImageProps } from '@/types';
-import { motion, AnimatePresence } from 'framer-motion';
 import { X, CameraOff } from 'lucide-react';
 
 export default function ClientImage({ src, alt }: ClientImageProps) {
@@ -44,44 +43,35 @@ export default function ClientImage({ src, alt }: ClientImageProps) {
         )}
       </div>
 
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-100 flex items-center justify-center bg-zinc-950/95 p-4 backdrop-blur-xl"
-            onClick={() => setIsOpen(false)}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-100 flex items-center justify-center bg-zinc-950/95 p-4 backdrop-blur-xl transition-opacity"
+          onClick={() => setIsOpen(false)}
+        >
+          <div
+            className="relative aspect-auto max-h-[85vh] w-full max-w-[500px] overflow-hidden rounded-3xl"
+            onClick={(e) => e.stopPropagation()}
           >
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              className="relative aspect-auto max-h-[85vh] w-full max-w-[500px] overflow-hidden rounded-3xl"
-              onClick={(e) => e.stopPropagation()}
+            <button
+              className="absolute top-4 right-4 z-110 flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-zinc-950/50 text-white backdrop-blur-md transition-colors hover:bg-zinc-950/80"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsOpen(false);
+              }}
             >
-              <motion.button
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="absolute top-4 right-4 z-110 flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-zinc-950/50 text-white backdrop-blur-md transition-colors hover:bg-zinc-950/80"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsOpen(false);
-                }}
-              >
-                <X size={20} />
-              </motion.button>
-              <Image
-                src={src}
-                alt={alt}
-                width={800}
-                height={1200}
-                className="h-full w-full object-contain"
-                priority
-              />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              <X size={20} />
+            </button>
+            <Image
+              src={src}
+              alt={alt}
+              width={800}
+              height={1200}
+              className="h-full w-full object-contain"
+              priority
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 }

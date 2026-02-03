@@ -9,13 +9,14 @@ datasource db {
 
 // 1. Usuarios del Sistema (Administradores/Técnicos)
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  username  String   @unique
-  password  String
-  name      String
-  role      Role     @default(ADMIN)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  username     String   @unique
+  password     String
+  name         String
+  role         Role     @default(ADMIN)
+  profileImage String? // Foto de perfil en base64
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 enum Role {
@@ -37,6 +38,8 @@ model Client {
   longitude   Float?
   imageUrl    String?
   serviceCost Float?       @default(0)
+  dniFront    String?
+  dniBack     String?
 
   // Relaciones
   installations Installation[]
@@ -59,8 +62,8 @@ model Installation {
   clientId String @db.ObjectId
   client   Client @relation(fields: [clientId], references: [id])
 
-  equipmentCount Int     @default(1)
-  ipPort         String? // Ej: 192.168.1.1:8080
+  equipmentCount Int      @default(1)
+  ipPorts        String[] @default([]) // Ej: ["192.168.1.1:8080", "192.168.1.2:8080"]
   techNotes      String?
 
   installedAt DateTime @default(now())

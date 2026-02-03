@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Phone, Router as RouterIcon } from 'lucide-react';
+import { Phone, Router as RouterIcon, MapPin } from 'lucide-react';
 
 // Modulares de UI
 import InfoGrid from '@/components/ui/InfoGrid';
@@ -78,6 +78,7 @@ export default function DetalleClienteClient({ client }: DetalleClienteClientPro
         monto: `ARS $ ${totalAmount.toLocaleString() || '0'}`,
         vencimiento: proximoVencimientoText,
         telefono: client.phone || '',
+        terminales: String(equipmentCount),
       });
       router.push(`/comprobante?${params.toString()}`);
     } else {
@@ -113,6 +114,12 @@ export default function DetalleClienteClient({ client }: DetalleClienteClientPro
     }
   };
 
+  // Preparar lista de Lg's
+  const ipPorts = client.installations[0]?.ipPorts || [];
+  const terminalList = ipPorts.length > 0 ? ipPorts.map((ip) => `• Lg: ${ip}`).join('\n') : '';
+
+  const infrastructureSubValue = `${client.installations[0]?.equipmentCount || 1} Terminales instaladas${terminalList ? `\n${terminalList}` : ''}`;
+
   // Preparar InfoGrid Items
   const infoItems: InfoItem[] = [
     {
@@ -122,9 +129,20 @@ export default function DetalleClienteClient({ client }: DetalleClienteClientPro
       icon: Phone,
     },
     {
+      label: 'Dirección',
+      value: client.address,
+      subValue: client.between ? `Entre: ${client.between}` : undefined,
+      icon: MapPin,
+      actionUrl:
+        client.latitude && client.longitude
+          ? `https://www.google.com/maps/search/?api=1&query=${client.latitude},${client.longitude}`
+          : undefined,
+      actionLabel: 'Ver en Mapa',
+    },
+    {
       label: 'Infraestructura',
       value: 'Alquiler de POSNET',
-      subValue: `${client.installations[0]?.equipmentCount || 1} Terminales instaladas`,
+      subValue: infrastructureSubValue,
       icon: RouterIcon,
     },
   ];
@@ -139,7 +157,23 @@ export default function DetalleClienteClient({ client }: DetalleClienteClientPro
 
   // 2. Pagos pendientes (los que aún no se cobraron)
   const pendingPayments = client.payments.filter((p) => p.status === 'PENDING');
-  const saldoTotal = pendingPayments.reduce((acc, p) => acc + p.amount, 0);
+  const dbPendingAmount = pendingPayments.reduce((acc, p) => acc + p.amount, 0);
+
+  // Calcular costo mensual
+  const equipmentCount = client.installations[0]?.equipmentCount || 1;
+  const monthlyCost = (client.serviceCost || 0) * equipmentCount;
+
+  let saldoTotal = 0;
+  if (status === 'OVERDUE') {
+    if (dbPendingAmount > 0) {
+      saldoTotal = dbPendingAmount;
+    } else {
+      // Fallback: Calcular deuda estimada based on days overdue
+      // daysUntilExpiration es negativo cuando está vencido
+      const monthsOwed = Math.ceil(Math.abs(daysUntilExpiration) / 30);
+      saldoTotal = Math.max(1, monthsOwed) * monthlyCost;
+    }
+  }
 
   const formatDate = (date: Date | null | string) => {
     if (!date) return 'Sin fecha';
@@ -182,9 +216,9 @@ export default function DetalleClienteClient({ client }: DetalleClienteClientPro
   }
 
   const getBottomPadding = () => {
-    if (activeTab === 'Configuración') return 'pb-10';
-    if (activeTab === 'Historial') return 'pb-32';
-    return 'pb-48';
+    if (activeTab === 'Configuración') return 'pb-4';
+    if (activeTab === 'Historial') return 'pb-6';
+    return 'pb-24';
   };
 
   return (
@@ -208,7 +242,6 @@ export default function DetalleClienteClient({ client }: DetalleClienteClientPro
 
             <AccountSummary
               vencimiento={vencimientoLabel}
-              proximoVencimiento={proximoVencimientoText}
               saldoPendiente={`$${saldoTotal.toLocaleString()}`}
               notas={client.notes || 'Sin notas u observaciones adicionales.'}
             />

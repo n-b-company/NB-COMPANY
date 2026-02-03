@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LogOut, User, Camera, ShieldCheck, BadgeCheck } from 'lucide-react';
-import { logout } from '@/lib/actions';
+import { logout, getUserProfileImage, updateProfileImage } from '@/lib/actions';
 import { toast } from 'sonner';
 import { ImageCapture } from '@/components/ui/SpecialInputs';
 import Image from 'next/image';
@@ -13,24 +13,44 @@ import LoadingOverlay from '@/components/ui/LoadingOverlay';
 export default function PerfilPage() {
   const [techImage, setTechImage] = useState<string | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isLoadingImage, setIsLoadingImage] = useState(true);
+  const [isSavingImage, setIsSavingImage] = useState(false);
 
-  // Load image on mount
-  React.useEffect(() => {
-    const savedImage = localStorage.getItem('tech_image');
-    if (savedImage) setTechImage(savedImage);
+  // Cargar imagen desde la base de datos al montar
+  useEffect(() => {
+    const loadProfileImage = async () => {
+      const result = await getUserProfileImage();
+      if (result.success && result.profileImage) {
+        setTechImage(result.profileImage);
+      }
+      setIsLoadingImage(false);
+    };
+
+    loadProfileImage();
   }, []);
 
-  const handleUpdateImage = (image: string | null) => {
+  const handleUpdateImage = async (image: string | null) => {
+    setIsSavingImage(true);
     setTechImage(image);
-    if (image) {
-      localStorage.setItem('tech_image', image);
-      toast.success('Foto de perfil actualizada correctamente');
-    } else {
-      localStorage.removeItem('tech_image');
-      toast.info('Foto de perfil removida');
+
+    try {
+      const result = await updateProfileImage(image);
+      if (result.success) {
+        toast.success('Foto de perfil actualizada correctamente');
+        // Dispatch event para sincronizar con otros componentes (como Header)
+        window.dispatchEvent(new Event('tech-image-updated'));
+      } else {
+        toast.error(result.error || 'No se pudo actualizar la foto');
+        // Revertir el cambio si falló
+        const prevResult = await getUserProfileImage();
+        setTechImage(prevResult.profileImage || null);
+      }
+    } catch (error) {
+      console.error('Error updating image:', error);
+      toast.error('Error al actualizar la foto de perfil');
+    } finally {
+      setIsSavingImage(false);
     }
-    // Dispatch event to sync other components (like Header)
-    window.dispatchEvent(new Event('tech-image-updated'));
   };
 
   const handleLogout = async () => {
@@ -40,13 +60,19 @@ export default function PerfilPage() {
 
   return (
     <div className="flex flex-col gap-8 px-6 py-10 pb-32">
-      {isLoggingOut && <LoadingOverlay />}
+      {(isLoggingOut || isSavingImage) && (
+        <LoadingOverlay message={isSavingImage ? 'Guardando foto...' : 'Cerrando sesión...'} />
+      )}
       {/* Header Perfil */}
       <div className="flex flex-col items-center text-center">
         <div className="relative mb-6">
           <div className="bg-primary/20 absolute inset-0 animate-pulse rounded-full blur-2xl" />
           <div className="relative flex h-32 w-32 items-center justify-center overflow-hidden rounded-full border-2 border-zinc-800 bg-zinc-900 shadow-2xl">
-            {techImage ? (
+            {isLoadingImage ? (
+              <div className="animate-pulse text-zinc-700">
+                <User size={64} />
+              </div>
+            ) : techImage ? (
               <Image src={techImage} alt="Técnico" fill className="object-cover" unoptimized />
             ) : (
               <User size={64} className="text-zinc-700" />
@@ -83,8 +109,7 @@ export default function PerfilPage() {
             required={false}
           />
           <p className="mt-4 px-2 text-center text-xs leading-relaxed text-zinc-500 italic">
-            Esta foto se utilizará para identificarte ante los clientes durante las instalaciones y
-            mantenimientos.
+            Esta foto se guardará en la nube y estará disponible en todos tus dispositivos.
           </p>
         </div>
       </div>

@@ -3,7 +3,6 @@
 import { Package, AlertTriangle, FileX } from 'lucide-react';
 import { StatItemProps, StatsGridProps } from '@/types';
 import { STAT_VARIANTS } from '@/constants/constants';
-import { motion } from 'framer-motion';
 
 interface StatItemPropsExtended extends StatItemProps {
   isActive?: boolean;
@@ -11,25 +10,13 @@ interface StatItemPropsExtended extends StatItemProps {
   index: number;
 }
 
-function StatItem({
-  label,
-  value,
-  icon: Icon,
-  variant,
-  isActive,
-  onClick,
-  index,
-}: StatItemPropsExtended) {
+function StatItem({ label, value, icon: Icon, variant, isActive, onClick }: StatItemPropsExtended) {
   const style = STAT_VARIANTS[variant];
 
   return (
-    <motion.button
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
-      whileTap={{ scale: 0.95 }}
+    <button
       onClick={onClick}
-      className={`group flex w-full flex-col rounded-2xl border p-4 text-left transition-all duration-300 ${
+      className={`group flex w-full flex-col rounded-2xl border p-4 text-left transition-all duration-300 active:scale-95 ${
         isActive
           ? `border-primary bg-primary/10 shadow-primary/5 shadow-lg`
           : `border-zinc-800 bg-zinc-900 ${style.border}`
@@ -58,7 +45,7 @@ function StatItem({
       >
         {value}
       </p>
-    </motion.button>
+    </button>
   );
 }
 

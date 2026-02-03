@@ -19,12 +19,28 @@ export async function createClientWithInstallation(data: InstalacionFormValues) 
     const validatedData = instalacionSchema.parse(data);
 
     let finalImageUrl: string | null = validatedData.image_url || null;
+    let finalDniFront: string | null = validatedData.dni_front || null;
+    let finalDniBack: string | null = validatedData.dni_back || null;
 
     // Si tenemos una cadena base64, la subimos a la API
     if (finalImageUrl && finalImageUrl.startsWith('data:image')) {
       const uploadedUrl = await uploadImage(finalImageUrl);
       if (uploadedUrl) {
         finalImageUrl = uploadedUrl;
+      }
+    }
+
+    if (finalDniFront && finalDniFront.startsWith('data:image')) {
+      const uploadedUrl = await uploadImage(finalDniFront);
+      if (uploadedUrl) {
+        finalDniFront = uploadedUrl;
+      }
+    }
+
+    if (finalDniBack && finalDniBack.startsWith('data:image')) {
+      const uploadedUrl = await uploadImage(finalDniBack);
+      if (uploadedUrl) {
+        finalDniBack = uploadedUrl;
       }
     }
 
@@ -39,6 +55,8 @@ export async function createClientWithInstallation(data: InstalacionFormValues) 
         latitude: validatedData.latitude,
         longitude: validatedData.longitude,
         imageUrl: finalImageUrl,
+        dniFront: finalDniFront,
+        dniBack: finalDniBack,
         serviceCost: validatedData.costo_servicio,
         notes: validatedData.notas,
       },
@@ -49,7 +67,7 @@ export async function createClientWithInstallation(data: InstalacionFormValues) 
       data: {
         clientId: client.id,
         equipmentCount: validatedData.cantidad_equipos,
-        ipPort: validatedData.ip_puerto,
+        ipPorts: validatedData.ip_puertos?.map((p) => p.value) || [],
         techNotes: validatedData.notas,
         installedAt: new Date(validatedData.fecha_instalacion),
       },
@@ -72,14 +90,22 @@ export async function updateClient(clientId: string, data: InstalacionFormValues
   try {
     const validatedData = instalacionSchema.parse(data);
 
-    let finalImageUrl: string | null = validatedData.image_url || null;
+    let finalImageUrl: string | undefined = undefined;
+    if (validatedData.image_url && validatedData.image_url.startsWith('data:image')) {
+      const uploaded = await uploadImage(validatedData.image_url);
+      if (uploaded) finalImageUrl = uploaded;
+    }
 
-    // Si tenemos una cadena base64, la subimos a la API
-    if (finalImageUrl && finalImageUrl.startsWith('data:image')) {
-      const uploadedUrl = await uploadImage(finalImageUrl);
-      if (uploadedUrl) {
-        finalImageUrl = uploadedUrl;
-      }
+    let finalDniFront: string | undefined = undefined;
+    if (validatedData.dni_front && validatedData.dni_front.startsWith('data:image')) {
+      const uploaded = await uploadImage(validatedData.dni_front);
+      if (uploaded) finalDniFront = uploaded;
+    }
+
+    let finalDniBack: string | undefined = undefined;
+    if (validatedData.dni_back && validatedData.dni_back.startsWith('data:image')) {
+      const uploaded = await uploadImage(validatedData.dni_back);
+      if (uploaded) finalDniBack = uploaded;
     }
 
     // 1. Actualizar Cliente
@@ -93,7 +119,10 @@ export async function updateClient(clientId: string, data: InstalacionFormValues
         between: validatedData.entre_calles,
         latitude: validatedData.latitude,
         longitude: validatedData.longitude,
+        // Only update images if we have new values (undefined is ignored by Prisma update)
         imageUrl: finalImageUrl,
+        dniFront: finalDniFront,
+        dniBack: finalDniBack,
         serviceCost: validatedData.costo_servicio,
         notes: validatedData.notas,
       },
@@ -102,6 +131,7 @@ export async function updateClient(clientId: string, data: InstalacionFormValues
     // 2. Actualizar la primera instalación (asumiendo flujo 1:1)
     const installation = await prisma.installation.findFirst({
       where: { clientId },
+      orderBy: { installedAt: 'desc' },
     });
 
     if (installation) {
@@ -109,7 +139,7 @@ export async function updateClient(clientId: string, data: InstalacionFormValues
         where: { id: installation.id },
         data: {
           equipmentCount: validatedData.cantidad_equipos,
-          ipPort: validatedData.ip_puerto,
+          ipPorts: validatedData.ip_puertos?.map((p) => p.value) || [],
           techNotes: validatedData.notas,
         },
       });
@@ -181,5 +211,51 @@ export async function renewSubscription(clientId: string, amount: number) {
   } catch (error) {
     console.error('Error in renewSubscription:', error);
     return { success: false, error: 'No se pudo procesar la renovación' };
+  }
+}
+
+// Obtener la imagen de perfil del usuario autenticado
+export async function getUserProfileImage() {
+  try {
+    // Por ahora asumimos que hay un solo usuario admin
+    // TODO: Implementar autenticación con sesión para obtener el user ID real
+    const user = await prisma.user.findFirst({
+      where: { username: 'nbadmin' },
+      select: { profileImage: true },
+    });
+
+    return { success: true, profileImage: user?.profileImage || null };
+  } catch (error) {
+    console.error('Error getting profile image:', error);
+    return { success: false, profileImage: null };
+  }
+}
+
+// Actualizar la imagen de perfil del usuario
+export async function updateProfileImage(imageData: string | null) {
+  try {
+    let finalImageUrl: string | null = imageData;
+
+    // Si tenemos una cadena base64, la subimos a imgbb
+    if (finalImageUrl && finalImageUrl.startsWith('data:image')) {
+      const uploadedUrl = await uploadImage(finalImageUrl);
+      if (uploadedUrl) {
+        finalImageUrl = uploadedUrl;
+      }
+    }
+
+    // Por ahora asumimos que hay un solo usuario admin
+    // TODO: Implementar autenticación con sesión para obtener el user ID real
+    await prisma.user.updateMany({
+      where: { username: 'nbadmin' },
+      data: { profileImage: finalImageUrl },
+    });
+
+    revalidatePath('/perfil');
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating profile image:', error);
+    return { success: false, error: 'No se pudo actualizar la imagen de perfil' };
   }
 }

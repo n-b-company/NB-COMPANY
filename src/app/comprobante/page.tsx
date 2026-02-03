@@ -29,6 +29,7 @@ function ComprobanteContent() {
     monto: searchParams.get('monto') || 'ARS $ 0,00',
     status: 'Aprobado',
     proximoVencimiento: searchParams.get('vencimiento') || '-- --- ----',
+    terminales: searchParams.get('terminales') || '1',
   };
 
   const clientPhone = searchParams.get('telefono') || '';
@@ -41,6 +42,7 @@ function ComprobanteContent() {
       `*Fecha:* ${ticketData.fecha}\n` +
       `*Monto:* ${ticketData.monto}\n` +
       `*Estado:* ${ticketData.status}\n` +
+      `*Terminales:* ${ticketData.terminales}\n` +
       `*Próximo Vencimiento:* ${ticketData.proximoVencimiento}\n\n` +
       `_Gracias por confiar en NB COMPANY_`;
 

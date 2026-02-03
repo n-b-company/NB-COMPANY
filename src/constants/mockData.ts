@@ -187,9 +187,9 @@ export const DEFAULT_INFO_ITEMS = [
 export const CLIENT_FILTER_OPTIONS = [
   { id: 'all', label: 'Todos' },
   { id: 'success', label: 'Al día' },
-  { id: 'warning', label: 'Prox. Vencimiento' },
+  { id: 'warning', label: 'Próximo' },
   { id: 'danger', label: 'Vencido' },
-  { id: 'inactive', label: 'Desactivados' },
+  { id: 'inactive', label: 'Inactivos' },
 ];
 
 export const COBROS_FILTER_OPTIONS = [
