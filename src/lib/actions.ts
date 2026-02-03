@@ -7,6 +7,7 @@ import { instalacionSchema, type InstalacionFormValues } from '@/lib/validations
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { uploadImage } from '@/lib/upload';
+import { generateShareToken } from '@/lib/share-token';
 
 export async function logout() {
   await authLogout();
@@ -257,5 +258,32 @@ export async function updateProfileImage(imageData: string | null) {
   } catch (error) {
     console.error('Error updating profile image:', error);
     return { success: false, error: 'No se pudo actualizar la imagen de perfil' };
+  }
+}
+
+// Generar link compartible para vendedor
+export async function generateShareLink(clientId: string) {
+  try {
+    // Verificar que el cliente existe
+    const client = await prisma.client.findUnique({
+      where: { id: clientId },
+      select: { id: true, name: true },
+    });
+
+    if (!client) {
+      return { success: false, error: 'Cliente no encontrado' };
+    }
+
+    // Generar token con vencimiento de 24 horas
+    const token = await generateShareToken(clientId, 24);
+
+    // Construir URL (ajustar según tu dominio en producción)
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const shareUrl = `${baseUrl}/public/${clientId}?token=${token}`;
+
+    return { success: true, shareUrl };
+  } catch (error) {
+    console.error('Error generating share link:', error);
+    return { success: false, error: 'No se pudo generar el link de compartir' };
   }
 }

@@ -17,7 +17,7 @@ import ClientHistory from '@/components/cliente/ClientHistory';
 import ClientLocation from '@/components/cliente/ClientLocation';
 import ClientActions from '@/components/cliente/ClientActions';
 import ClientConfig from '@/components/cliente/ClientConfig';
-import { toggleClientStatus, renewSubscription } from '@/lib/actions';
+import { toggleClientStatus, renewSubscription, generateShareLink } from '@/lib/actions';
 
 import { Client, InfoItem, Installation, Payment } from '@/types';
 import { STATUS_TEXT_MAP } from '@/constants/constants';
@@ -111,6 +111,40 @@ export default function DetalleClienteClient({ client }: DetalleClienteClientPro
       window.open(`https://wa.me/${client.phone.replace(/[^0-9]/g, '')}`, '_blank');
     } else {
       toast.error('Este cliente no tiene un teléfono registrado');
+    }
+  };
+
+  const handleShare = async () => {
+    const loadingToast = toast.loading('Generando link de compartir...');
+
+    try {
+      const result = await generateShareLink(client.id);
+
+      if (result.success && result.shareUrl) {
+        // Copiar al portapapeles
+        await navigator.clipboard.writeText(result.shareUrl);
+
+        toast.dismiss(loadingToast);
+        toast.success('Link copiado al portapapeles', {
+          description: 'El link es válido por 24 horas',
+          action: {
+            label: 'Compartir por WhatsApp',
+            onClick: () => {
+              const message = encodeURIComponent(
+                `Hola! Te comparto la información del cliente ${client.name}:\n\n${result.shareUrl}\n\n*Este link expira en 24 horas*`,
+              );
+              window.open(`https://wa.me/?text=${message}`, '_blank');
+            },
+          },
+        });
+      } else {
+        toast.dismiss(loadingToast);
+        toast.error(result.error || 'No se pudo generar el link');
+      }
+    } catch (error) {
+      toast.dismiss(loadingToast);
+      toast.error('Error al generar el link de compartir');
+      console.error('Share error:', error);
     }
   };
 
@@ -228,6 +262,7 @@ export default function DetalleClienteClient({ client }: DetalleClienteClientPro
         id={`#${client.id.substring(client.id.length - 8).toUpperCase()}`}
         statusText={dynamicStatusText}
         onBack={() => router.back()}
+        onShare={handleShare}
       />
 
       <ClientTabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
