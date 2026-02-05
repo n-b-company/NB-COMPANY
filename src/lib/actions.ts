@@ -86,9 +86,8 @@ export async function createClientWithInstallation(data: InstalacionFormValues) 
       },
     });
 
-    // Revalidar las rutas que listan clientes
+    // Revalidar rutas necesarias
     revalidatePath('/clientes');
-    revalidatePath('/dashboard');
 
     return { success: true, data: { client, installation } };
   } catch (error) {
@@ -188,8 +187,6 @@ export async function updateClient(clientId: string, data: InstalacionFormValues
     }
 
     revalidatePath(`/cliente/${clientId}`);
-    revalidatePath('/clientes');
-    revalidatePath('/dashboard');
 
     return { success: true };
   } catch (error) {
@@ -211,8 +208,6 @@ export async function toggleClientStatus(clientId: string, currentStatus: string
     });
 
     revalidatePath(`/cliente/${clientId}`);
-    revalidatePath('/clientes');
-    revalidatePath('/dashboard');
 
     return { success: true, newStatus };
   } catch {
@@ -244,10 +239,8 @@ export async function renewSubscription(clientId: string, amount: number) {
       data: { status: 'ACTIVE' },
     });
 
+    // Solo revalidar la página del cliente para reducir escrituras
     revalidatePath(`/cliente/${clientId}`);
-    revalidatePath('/clientes');
-    revalidatePath('/dashboard');
-    revalidatePath('/cobros');
 
     return { success: true };
   } catch (error) {

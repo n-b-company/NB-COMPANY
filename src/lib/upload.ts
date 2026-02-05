@@ -26,14 +26,10 @@ export async function uploadImage(base64: string): Promise<string | null> {
     formData.append('file', file, fileName);
     formData.append('folder', 'clients'); // Carpeta para organizar las imágenes de clientes
 
-    console.log('Subiendo imagen a:', apiUrl);
-
     const response = await fetch(apiUrl, {
       method: 'POST',
       body: formData,
     });
-
-    console.log('Response status:', response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -43,7 +39,6 @@ export async function uploadImage(base64: string): Promise<string | null> {
 
     // La API responde con JSON: { url, key }
     const result = await response.json();
-    console.log('Respuesta del servidor:', result);
 
     if (!result.url) {
       throw new Error('No se recibió URL del archivo subido');
