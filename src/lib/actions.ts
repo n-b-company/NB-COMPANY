@@ -28,6 +28,10 @@ export async function createClientWithInstallation(data: InstalacionFormValues) 
       const uploadedUrl = await uploadImage(finalImageUrl);
       if (uploadedUrl) {
         finalImageUrl = uploadedUrl;
+      } else {
+        throw new Error(
+          'No se pudo subir la foto del local. Verifica la configuración del servidor.',
+        );
       }
     }
 
@@ -35,6 +39,10 @@ export async function createClientWithInstallation(data: InstalacionFormValues) 
       const uploadedUrl = await uploadImage(finalDniFront);
       if (uploadedUrl) {
         finalDniFront = uploadedUrl;
+      } else {
+        throw new Error(
+          'No se pudo subir la foto del DNI (Frente). Verifica la configuración del servidor.',
+        );
       }
     }
 
@@ -42,6 +50,10 @@ export async function createClientWithInstallation(data: InstalacionFormValues) 
       const uploadedUrl = await uploadImage(finalDniBack);
       if (uploadedUrl) {
         finalDniBack = uploadedUrl;
+      } else {
+        throw new Error(
+          'No se pudo subir la foto del DNI (Dorso). Verifica la configuración del servidor.',
+        );
       }
     }
 
@@ -91,22 +103,51 @@ export async function updateClient(clientId: string, data: InstalacionFormValues
   try {
     const validatedData = instalacionSchema.parse(data);
 
-    let finalImageUrl: string | undefined = undefined;
-    if (validatedData.image_url && validatedData.image_url.startsWith('data:image')) {
+    // Manejar image_url: subir nueva o borrar
+    let finalImageUrl: string | null | undefined = undefined;
+    if (validatedData.image_url === '') {
+      // Si es cadena vacía, borrar la imagen
+      finalImageUrl = null;
+    } else if (validatedData.image_url && validatedData.image_url.startsWith('data:image')) {
+      // Si es base64, subir nueva imagen
       const uploaded = await uploadImage(validatedData.image_url);
-      if (uploaded) finalImageUrl = uploaded;
+      if (uploaded) {
+        finalImageUrl = uploaded;
+      } else {
+        throw new Error(
+          'No se pudo subir la foto del local. Verifica la configuración del servidor.',
+        );
+      }
     }
 
-    let finalDniFront: string | undefined = undefined;
-    if (validatedData.dni_front && validatedData.dni_front.startsWith('data:image')) {
+    // Manejar dni_front: subir nueva o borrar
+    let finalDniFront: string | null | undefined = undefined;
+    if (validatedData.dni_front === '') {
+      finalDniFront = null;
+    } else if (validatedData.dni_front && validatedData.dni_front.startsWith('data:image')) {
       const uploaded = await uploadImage(validatedData.dni_front);
-      if (uploaded) finalDniFront = uploaded;
+      if (uploaded) {
+        finalDniFront = uploaded;
+      } else {
+        throw new Error(
+          'No se pudo subir la foto del DNI (Frente). Verifica la configuración del servidor.',
+        );
+      }
     }
 
-    let finalDniBack: string | undefined = undefined;
-    if (validatedData.dni_back && validatedData.dni_back.startsWith('data:image')) {
+    // Manejar dni_back: subir nueva o borrar
+    let finalDniBack: string | null | undefined = undefined;
+    if (validatedData.dni_back === '') {
+      finalDniBack = null;
+    } else if (validatedData.dni_back && validatedData.dni_back.startsWith('data:image')) {
       const uploaded = await uploadImage(validatedData.dni_back);
-      if (uploaded) finalDniBack = uploaded;
+      if (uploaded) {
+        finalDniBack = uploaded;
+      } else {
+        throw new Error(
+          'No se pudo subir la foto del DNI (Dorso). Verifica la configuración del servidor.',
+        );
+      }
     }
 
     // 1. Actualizar Cliente

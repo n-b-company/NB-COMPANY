@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { Camera, MapPin, Calendar, Check, X, RefreshCw } from 'lucide-react';
 import { ImageCaptureProps, LocationCaptureProps, DatePickerProps } from '@/types';
@@ -16,6 +16,11 @@ export const ImageCapture = ({
 }: ImageCaptureProps) => {
   const [preview, setPreview] = useState<string | null>(value || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sincronizar preview con el valor externo
+  useEffect(() => {
+    setPreview(value || null);
+  }, [value]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -67,6 +72,14 @@ export const ImageCapture = ({
               className="absolute -top-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white shadow-lg transition-colors hover:bg-red-600"
             >
               <X size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute bottom-2 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-lg bg-zinc-900/90 px-4 py-2 text-xs font-bold text-white shadow-lg backdrop-blur-sm transition-colors hover:bg-zinc-800"
+            >
+              <Camera size={14} />
+              Cambiar Foto
             </button>
           </div>
         ) : (
