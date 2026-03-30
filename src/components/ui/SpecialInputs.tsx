@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { Camera, MapPin, Calendar, Check, X, RefreshCw } from 'lucide-react';
 import { ImageCaptureProps, LocationCaptureProps, DatePickerProps } from '@/types';
@@ -14,13 +14,9 @@ export const ImageCapture = ({
   value,
   required,
 }: ImageCaptureProps) => {
-  const [preview, setPreview] = useState<string | null>(value || null);
+  // Usar el valor externo directamente como preview
+  const preview = value || null;
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Sincronizar preview con el valor externo
-  useEffect(() => {
-    setPreview(value || null);
-  }, [value]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -28,7 +24,6 @@ export const ImageCapture = ({
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64 = reader.result as string;
-        setPreview(base64);
         onImageCapture(base64);
       };
       reader.readAsDataURL(file);
@@ -36,7 +31,6 @@ export const ImageCapture = ({
   };
 
   const clearImage = () => {
-    setPreview(null);
     onImageCapture(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
