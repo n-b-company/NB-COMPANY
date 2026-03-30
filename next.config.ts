@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'upload-images.api.appwiseinnovations.com',
+        hostname: 'appwiseinnovations.dev',
       },
       {
         protocol: 'https',

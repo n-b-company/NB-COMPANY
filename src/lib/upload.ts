@@ -1,61 +1,80 @@
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+
+// Configurar cliente S3 para Cloudflare R2
+const s3Client = new S3Client({
+  region: process.env.STORAGE_REGION || 'auto',
+  endpoint: process.env.STORAGE_ENDPOINT,
+  credentials: {
+    accessKeyId: process.env.STORAGE_ACCESS_KEY || '',
+    secretAccessKey: process.env.STORAGE_SECRET_KEY || '',
+  },
+});
+
 export async function uploadImage(base64: string): Promise<string | null> {
   try {
-    const apiUrl = process.env.UPLOAD_IMAGE_API_URL;
-    if (!apiUrl) {
-      console.error('UPLOAD_IMAGE_API_URL no está configurada');
+    // Validar que el storage esté habilitado y configurado
+    if (process.env.ENABLE_STORAGE !== 'true') {
+      console.error('Storage is disabled');
       return null;
     }
 
-    // Convertir base64 a File (no Blob)
-    const base64Data = base64.split(',')[1];
-    const mimeType = base64.split(',')[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
-
-    const byteCharacters = atob(base64Data);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    if (
+      !process.env.STORAGE_ENDPOINT ||
+      !process.env.STORAGE_ACCESS_KEY ||
+      !process.env.STORAGE_SECRET_KEY ||
+      !process.env.STORAGE_BUCKET ||
+      !process.env.STORAGE_PUBLIC_URL
+    ) {
+      console.error('R2 credentials not configured');
+      return null;
     }
-    const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: mimeType });
 
-    // Crear un File desde el Blob
-    const fileName = `client-${Date.now()}.jpg`;
-    const file = new File([blob], fileName, { type: mimeType });
+    // Extraer el tipo de imagen y los datos base64
+    const matches = base64.match(/^data:image\/(\w+);base64,(.+)$/);
+    if (!matches) {
+      console.error('Invalid base64 format');
+      return null;
+    }
 
-    const formData = new FormData();
-    formData.append('file', file, fileName);
-    formData.append('folder', 'clients'); // Carpeta para organizar las imágenes de clientes
+    const imageType = matches[1];
+    const imageData = matches[2];
+    const buffer = Buffer.from(imageData, 'base64');
 
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      body: formData,
+    // Validar tamaño máximo (5MB para avatares)
+    const maxSize = parseInt(process.env.UPLOAD_MAX_SIZE_AVATAR || '5242880');
+    if (buffer.length > maxSize) {
+      console.error(`Image size exceeds maximum allowed: ${maxSize} bytes`);
+      return null;
+    }
+
+    // Validar extensión permitida
+    const allowedImages = process.env.UPLOAD_ALLOWED_IMAGES || 'jpg|jpeg|png|webp|gif';
+    const allowedExtensions = allowedImages.split('|');
+    if (!allowedExtensions.includes(imageType.toLowerCase())) {
+      console.error(`Image type not allowed: ${imageType}`);
+      return null;
+    }
+
+    // Generar nombre único para el archivo usando PROJECT_NAME
+    const projectName = process.env.PROJECT_NAME || 'nb-company';
+    const fileName = `${projectName}/clients/${Date.now()}-${Math.random().toString(36).substring(7)}.${imageType}`;
+
+    // Subir a R2
+    const command = new PutObjectCommand({
+      Bucket: process.env.STORAGE_BUCKET,
+      Key: fileName,
+      Body: buffer,
+      ContentType: `image/${imageType}`,
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Error al subir imagen:', response.status, errorText);
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+    await s3Client.send(command);
 
-    // La API responde con JSON: { url, key }
-    const result = await response.json();
-
-    if (!result.url) {
-      throw new Error('No se recibió URL del archivo subido');
-    }
-
-    // Corregir URL decodificando %2F a /
-    let correctedUrl = result.url.replace(/%2F/g, '/');
-
-    // Asegurar que la estructura de la URL sea correcta
-    if (correctedUrl.includes('/r2-appwise/') && !correctedUrl.includes('/r2-appwise/clients/')) {
-      correctedUrl = correctedUrl.replace('/r2-appwise/', '/r2-appwise/clients/');
-    }
-
-    console.log('URL corregida:', correctedUrl);
-    return correctedUrl;
+    // Retornar la URL pública
+    const publicUrl = `${process.env.STORAGE_PUBLIC_URL}/${fileName}`;
+    console.log('Image uploaded successfully:', publicUrl);
+    return publicUrl;
   } catch (error) {
-    console.error('Error en uploadImage:', error);
+    console.error('Error uploading image to R2:', error);
     return null;
   }
 }
