@@ -19,6 +19,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'appwiseinnovations.dev',
       },
+      {
+        protocol: 'https',
+        hostname: 'appwiseinnovations.dev',
+      },
     ],
   },
   experimental: {

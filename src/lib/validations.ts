@@ -22,7 +22,7 @@ export const instalacionSchema = z.object({
   cantidad_equipos: z
     .number({ message: 'Debe ser un número' })
     .min(1, 'Debe haber al menos 1 equipo'),
-  ip_puerto: z.string().optional(),
+  ip_puertos: z.array(z.object({ value: z.string() })).optional(),
   costo_servicio: z
     .number({ message: 'Debe ser un número' })
     .min(0, 'El costo no puede ser negativo'),
@@ -30,6 +30,8 @@ export const instalacionSchema = z.object({
   latitude: z.number().optional().nullable(),
   longitude: z.number().optional().nullable(),
   image_url: z.string().optional(),
+  dni_front: z.string().optional(),
+  dni_back: z.string().optional(),
   fecha_instalacion: z.string().min(1, 'La fecha es obligatoria'),
 });
 

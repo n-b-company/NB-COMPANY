@@ -4,23 +4,28 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { ASSETS } from '@/constants/constants';
 import { User as UserIcon } from 'lucide-react';
+import { getUserProfileImage } from '@/lib/actions';
 
 export default function AppHeader() {
   const [techImage, setTechImage] = useState<string | null>(null);
 
   useEffect(() => {
-    // Load image from localStorage
-    const savedImage = localStorage.getItem('tech_image');
-    if (savedImage) {
-      requestAnimationFrame(() => {
-        setTechImage(savedImage);
-      });
-    }
+    // Load image from database
+    const loadImage = async () => {
+      const result = await getUserProfileImage();
+      if (result.success && result.profileImage) {
+        setTechImage(result.profileImage);
+      }
+    };
+
+    loadImage();
 
     // Sync image changes from other parts of the app
-    const handleSync = () => {
-      const updatedImage = localStorage.getItem('tech_image');
-      setTechImage(updatedImage);
+    const handleSync = async () => {
+      const result = await getUserProfileImage();
+      if (result.success) {
+        setTechImage(result.profileImage);
+      }
     };
 
     window.addEventListener('tech-image-updated', handleSync);

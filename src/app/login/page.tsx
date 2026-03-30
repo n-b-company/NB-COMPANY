@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
 import Image from 'next/image';
 import { ASSETS } from '@/constants/constants';
 
@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -88,14 +89,24 @@ export default function LoginPage() {
                 error={errors.username?.message}
               />
 
-              <Input
-                id="password"
-                label="Contraseña"
-                type="password"
-                placeholder="nbdev2026"
-                {...register('password')}
-                error={errors.password?.message}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  label="Contraseña"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="nbdev2026"
+                  {...register('password')}
+                  error={errors.password?.message}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute top-[38px] right-3 text-zinc-500 transition-colors hover:text-zinc-300"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
             </div>
           </div>
 

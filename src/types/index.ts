@@ -13,6 +13,8 @@ export interface Client {
   status: string;
   notes?: string | null;
   imageUrl?: string | null;
+  dniFront?: string | null;
+  dniBack?: string | null;
   serviceCost?: number | null;
   latitude?: number | null;
   longitude?: number | null;
@@ -26,7 +28,7 @@ export interface Installation {
   id: string;
   clientId: string;
   equipmentCount: number;
-  ipPort?: string | null;
+  ipPorts?: string[];
   techNotes?: string | null;
   installedAt: Date;
   updatedAt: Date;
@@ -94,8 +96,6 @@ export interface FilterGroupProps {
   options: FilterOption[];
   activeFilter: string;
   onFilterChange: (id: string) => void;
-  label?: string;
-  showIcon?: boolean;
   className?: string;
 }
 
@@ -106,7 +106,7 @@ export interface FormSectionProps {
 }
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
+  label?: string;
   error?: string;
   required?: boolean;
   icon?: LucideIcon;
@@ -132,6 +132,8 @@ export interface InfoItem {
   subValue?: string;
   icon: LucideIcon;
   special?: boolean;
+  actionUrl?: string;
+  actionLabel?: string;
 }
 
 export interface InfoGridProps {
@@ -176,6 +178,7 @@ export interface TicketData {
   monto: string;
   status: 'Aprobado' | 'Pendiente' | 'Rechazado';
   proximoVencimiento: string;
+  terminales?: string;
 }
 
 export interface TicketCardProps {
@@ -184,7 +187,6 @@ export interface TicketCardProps {
 
 export interface AccountSummaryProps {
   vencimiento: string;
-  proximoVencimiento: string;
   saldoPendiente: string;
   ultimoPago: string;
   notas: string;

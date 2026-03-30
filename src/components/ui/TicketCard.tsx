@@ -30,6 +30,10 @@ export default function TicketCard({ data }: TicketCardProps) {
           <p className="text-xl font-black text-white">{data.monto}</p>
         </div>
         <div className="flex items-center justify-between border-b border-zinc-800/30 py-4">
+          <p className="text-sm font-medium text-zinc-500">Terminales Cobradas</p>
+          <p className="text-xl font-black text-white">{data.terminales || 1}</p>
+        </div>
+        <div className="flex items-center justify-between border-b border-zinc-800/30 py-4">
           <p className="text-sm font-medium text-zinc-500">Estado</p>
           <span
             className={`rounded-full border px-3 py-1 text-[10px] font-black tracking-wider uppercase ${

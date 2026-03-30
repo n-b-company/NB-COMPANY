@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { ClientTabsProps } from '@/types';
-import { motion } from 'framer-motion';
 
 export default function ClientTabs({ tabs, activeTab, onTabChange }: ClientTabsProps) {
   return (
@@ -20,11 +19,7 @@ export default function ClientTabs({ tabs, activeTab, onTabChange }: ClientTabsP
             >
               {tab}
               {isActive && (
-                <motion.div
-                  layoutId="activeTabUnderline"
-                  className="bg-primary absolute right-0 bottom-0 left-0 h-0.5"
-                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                />
+                <div className="bg-primary absolute right-0 bottom-0 left-0 h-0.5 transition-all" />
               )}
             </button>
           );

@@ -20,12 +20,22 @@ export default function InfoGrid({ items }: InfoGridProps) {
             )}
             {item.subValue && (
               <p
-                className={`mt-1 text-xs font-medium ${
+                className={`mt-1 text-xs font-medium whitespace-pre-line ${
                   item.special ? 'text-primary' : 'text-zinc-500'
                 }`}
               >
                 {item.subValue}
               </p>
+            )}
+            {item.actionUrl && (
+              <a
+                href={item.actionUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-primary/10 text-primary hover:bg-primary/20 mt-3 inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-bold transition-colors"
+              >
+                {item.actionLabel || 'Ver más'}
+              </a>
             )}
           </div>
         </div>

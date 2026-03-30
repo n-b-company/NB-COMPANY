@@ -10,7 +10,6 @@ import SearchBar from '@/components/ui/SearchBar';
 import FilterGroup from '@/components/ui/FilterGroup';
 import { STATUS_MAP, STATUS_TEXT_MAP } from '@/constants/constants';
 import { calculateDynamicStatus } from '@/lib/utils/status-calculator';
-import { motion, AnimatePresence } from 'framer-motion';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -115,41 +114,27 @@ export default function ClientesClient({ initialClients }: ClientesClientProps) 
 
       {/* Listado de Clientes */}
       <div className="flex min-h-[400px] flex-col gap-3">
-        <AnimatePresence mode="popLayout" initial={false}>
-          {paginatedClientes.length > 0 ? (
-            paginatedClientes.map((cliente) => (
-              <motion.div
-                key={cliente.id}
-                layout
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-              >
-                <EntityCard
-                  title={cliente.name}
-                  subtitle={cliente.address}
-                  imageUrl={cliente.imageUrl || undefined}
-                  icon={Store}
-                  statusText={cliente.dynamicText}
-                  statusVariant={STATUS_MAP[cliente.dynamicStatus] || 'success'}
-                  actionHref={`/cliente/${cliente.id}`}
-                />
-              </motion.div>
-            ))
-          ) : (
-            <motion.div
-              key="empty-state"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="py-20 text-center"
-            >
-              <p className="text-sm text-zinc-500 italic">
-                No se encontraron clientes con esos filtros.
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {paginatedClientes.length > 0 ? (
+          paginatedClientes.map((cliente) => (
+            <div key={cliente.id}>
+              <EntityCard
+                title={cliente.name}
+                subtitle={cliente.address}
+                imageUrl={cliente.imageUrl || undefined}
+                icon={Store}
+                statusText={cliente.dynamicText}
+                statusVariant={STATUS_MAP[cliente.dynamicStatus] || 'success'}
+                actionHref={`/cliente/${cliente.id}`}
+              />
+            </div>
+          ))
+        ) : (
+          <div className="py-20 text-center">
+            <p className="text-sm text-zinc-500 italic">
+              No se encontraron clientes con esos filtros.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Pagination Controls */}
