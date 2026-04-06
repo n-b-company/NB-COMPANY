@@ -216,11 +216,50 @@ export async function toggleClientStatus(clientId: string, currentStatus: string
 }
 export async function renewSubscription(clientId: string, amount: number) {
   try {
-    // 1. Obtener la fecha para el periodo del pago (el mes actual)
-    const now = new Date();
-    const period = new Date(now.getFullYear(), now.getMonth(), 1);
+    // 1. Obtener el cliente con sus pagos para calcular el próximo periodo
+    const client = await prisma.client.findUnique({
+      where: { id: clientId },
+      include: {
+        payments: {
+          where: { status: 'PAID' },
+          orderBy: { period: 'desc' },
+          take: 1,
+        },
+        installations: {
+          orderBy: { installedAt: 'desc' },
+          take: 1,
+        },
+      },
+    });
 
-    // 2. Crear el registro de pago cobrado
+    if (!client) {
+      return { success: false, error: 'Cliente no encontrado' };
+    }
+
+    // 2. Calcular el periodo del nuevo pago
+    // Si hay pagos previos, usar el último periodo + 1 mes
+    // Si no hay pagos, usar la fecha de instalación + 1 mes
+    // Si no hay instalación, usar el mes actual
+    const now = new Date();
+    let period: Date;
+
+    const lastPayment = client.payments[0];
+    const installation = client.installations[0];
+
+    if (lastPayment?.period) {
+      // Sumar 1 mes al último periodo pagado
+      period = new Date(lastPayment.period);
+      period.setMonth(period.getMonth() + 1);
+    } else if (installation?.installedAt) {
+      // Sumar 1 mes a la fecha de instalación
+      period = new Date(installation.installedAt);
+      period.setMonth(period.getMonth() + 1);
+    } else {
+      // Usar el mes actual como fallback
+      period = new Date(now.getFullYear(), now.getMonth(), 1);
+    }
+
+    // 3. Crear el registro de pago cobrado
     await prisma.payment.create({
       data: {
         clientId,
@@ -229,11 +268,11 @@ export async function renewSubscription(clientId: string, amount: number) {
         method: 'CASH',
         paidAt: now,
         period: period,
-        description: `Renovación de suscripción - ${now.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}`,
+        description: `Renovación de suscripción - ${period.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}`,
       },
     });
 
-    // 3. Actualizar el estado del cliente a ACTIVE
+    // 4. Actualizar el estado del cliente a ACTIVE
     await prisma.client.update({
       where: { id: clientId },
       data: { status: 'ACTIVE' },
@@ -271,24 +310,50 @@ export async function updateProfileImage(imageData: string | null) {
   try {
     let finalImageUrl: string | null = imageData;
 
-    // Si tenemos una cadena base64, la subimos a imgbb
+    // Si tenemos una cadena base64, intentamos subirla a R2
     if (finalImageUrl && finalImageUrl.startsWith('data:image')) {
+      console.log('Attempting to upload image to R2...');
       const uploadedUrl = await uploadImage(finalImageUrl);
+      
       if (uploadedUrl) {
+        console.log('Image uploaded successfully:', uploadedUrl);
         finalImageUrl = uploadedUrl;
+      } else {
+        console.warn('Failed to upload to R2, saving base64 directly');
+        // Si falla la subida, guardamos el base64 directamente
+        // Esto asegura que la imagen se guarde aunque R2 falle
       }
     }
 
-    // Por ahora asumimos que hay un solo usuario admin
-    // TODO: Implementar autenticación con sesión para obtener el user ID real
-    await prisma.user.updateMany({
+    // Buscar o crear el usuario admin
+    const user = await prisma.user.findFirst({
       where: { username: 'nbadmin' },
-      data: { profileImage: finalImageUrl },
     });
+
+    if (user) {
+      // Actualizar usuario existente
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { profileImage: finalImageUrl },
+      });
+      console.log('Profile image updated for existing user');
+    } else {
+      // Crear usuario si no existe
+      await prisma.user.create({
+        data: {
+          username: 'nbadmin',
+          password: 'hashed_password', // TODO: usar hash real
+          name: 'Admin NB Company',
+          role: 'ADMIN',
+          profileImage: finalImageUrl,
+        },
+      });
+      console.log('User created with profile image');
+    }
 
     revalidatePath('/perfil');
 
-    return { success: true };
+    return { success: true, imageUrl: finalImageUrl };
   } catch (error) {
     console.error('Error updating profile image:', error);
     return { success: false, error: 'No se pudo actualizar la imagen de perfil' };
