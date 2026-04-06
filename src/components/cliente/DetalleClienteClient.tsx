@@ -7,6 +7,7 @@ import { Phone, Router as RouterIcon, MapPin } from 'lucide-react';
 
 // Modulares de UI
 import InfoGrid from '@/components/ui/InfoGrid';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 // Componentes específicos de Cliente
 import ClientHeader from '@/components/cliente/ClientHeader';
@@ -35,6 +36,7 @@ interface DetalleClienteClientProps {
 export default function DetalleClienteClient({ client }: DetalleClienteClientProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('Información');
+  const [showRenewDialog, setShowRenewDialog] = useState(false);
 
   const { status, daysUntilExpiration } = client
     ? calculateDynamicStatus(client)
@@ -58,7 +60,12 @@ export default function DetalleClienteClient({ client }: DetalleClienteClientPro
   }
 
   // Handlers para acciones
-  const handleRenew = async () => {
+  // Handlers para acciones
+  const handleRenewClick = () => {
+    setShowRenewDialog(true);
+  };
+
+  const handleRenewConfirm = async () => {
     toast.loading('Procesando renovación...');
 
     // 1. Calcular el monto total (Costo Unitario x Cantidad de Equipos)
@@ -307,11 +314,23 @@ export default function DetalleClienteClient({ client }: DetalleClienteClientPro
         {activeTab !== 'Configuración' && (
           <ClientActions
             onWhatsApp={handleWhatsApp}
-            onRenew={handleRenew}
+            onRenew={handleRenewClick}
             onDeactivate={handleDeactivate}
             isInactive={status === 'INACTIVE'}
           />
         )}
+
+        {/* Diálogo de confirmación para renovación */}
+        <ConfirmDialog
+          isOpen={showRenewDialog}
+          onClose={() => setShowRenewDialog(false)}
+          onConfirm={handleRenewConfirm}
+          title="Confirmar Renovación"
+          message={`¿Estás seguro que deseas renovar la suscripción de ${client.name}? Se registrará un pago de ARS $ ${((client.serviceCost || 0) * (client.installations[0]?.equipmentCount || 1)).toLocaleString()}.`}
+          confirmText="Sí, Renovar"
+          cancelText="Cancelar"
+          type="info"
+        />
       </div>
     </div>
   );
