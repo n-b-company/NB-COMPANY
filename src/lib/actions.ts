@@ -208,6 +208,8 @@ export async function toggleClientStatus(clientId: string, currentStatus: string
     });
 
     revalidatePath(`/cliente/${clientId}`);
+    revalidatePath('/dashboard');
+    revalidatePath('/clientes');
 
     return { success: true, newStatus };
   } catch {
@@ -278,8 +280,9 @@ export async function renewSubscription(clientId: string, amount: number) {
       data: { status: 'ACTIVE' },
     });
 
-    // Solo revalidar la página del cliente para reducir escrituras
     revalidatePath(`/cliente/${clientId}`);
+    revalidatePath('/dashboard');
+    revalidatePath('/clientes');
 
     return { success: true };
   } catch (error) {
