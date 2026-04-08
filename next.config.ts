@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'appwiseinnovations.dev',
+        hostname: 'res.cloudinary.com',
       },
     ],
   },
